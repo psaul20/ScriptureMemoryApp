@@ -1,2 +1,1 @@
-# ScriptureMemoryApp
-# edit
+# ScriptureMemoryApp-
