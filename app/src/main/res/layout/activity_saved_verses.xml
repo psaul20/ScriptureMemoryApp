@@ -29,6 +29,7 @@
         app:backgroundTint="@android:color/background_dark"
         app:srcCompat="@android:drawable/ic_input_add" />
 
-    <include layout="@layout/content_saved_verses" />
+    <include layout="@layout/content_saved_verses"
+        android:id="@+id/include" />
 
 </android.support.design.widget.CoordinatorLayout>
