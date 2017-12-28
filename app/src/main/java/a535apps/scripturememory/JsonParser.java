@@ -1,10 +1,6 @@
 package a535apps.scripturememory;
 
-import android.util.JsonReader;
-import android.util.JsonToken;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import org.json.JSONObject;
 
 /**
  * Created by Patrick on 12/24/2017.
@@ -13,41 +9,53 @@ import java.io.InputStreamReader;
 
 public class JsonParser {
 
-    public static MemoryPassage readJsonStream(InputStream in) throws IOException {
-        JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
+    public static MemoryPassage readPassage(JSONObject response, MemoryPassage memoryPassage) {
+
         try {
-            return readPassage(reader);
-        } finally {
-            reader.close();
+            // Get passage jsonObject
+            JSONObject passage = (JSONObject) response.getJSONObject("response").getJSONObject("search")
+                    .getJSONObject("result").getJSONArray("passages").get(0);
+
+            // Get text field
+            String text = (String) passage.get("text");
+
+            // Parse text field for all verses
+            int currentStartBracketIndex = 0;
+            int currentEndBracketIndex = 0;
+            String finalPassage = "";
+            text = text.substring(text.indexOf("\n"));
+            while(true) {
+                currentEndBracketIndex = text.indexOf(">", currentStartBracketIndex);
+                text = text.substring(currentEndBracketIndex+1);
+                currentStartBracketIndex = text.indexOf("<");
+                if(currentStartBracketIndex == -1) {
+                    break;
+                }
+                String currentVersePart = text.substring(0, currentStartBracketIndex).trim();
+                try {
+                    int h;
+                    Integer.parseInt(currentVersePart);
+                } catch(NumberFormatException e) {
+                    if(currentVersePart.length() > 0) {
+                        Character firstChar = currentVersePart.charAt(0);
+                        // Check for special characters
+                        if (firstChar.toString().matches("[^a-z A-Z0-9]")) {
+                            finalPassage += currentVersePart;
+                        } else {
+                            finalPassage += " " + currentVersePart;
+                        }
+                    }
+                }
+            }
+
+            System.out.println("Verses Passage: " + finalPassage.trim());
+            memoryPassage.setText(finalPassage.trim());
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    }
 
-
-    public static MemoryPassage readPassage(JsonReader reader) throws IOException {
-        MemoryPassage passage = new MemoryPassage();
-
-        reader.beginObject();
-        while (reader.hasNext()) {
-            //Change these to reflect bible search API JSON structure
-/*            String name = reader.nextName();
-            if (name.equals("translation")) {
-                passage.setTranslation(reader.nextString());
-            } else if (name.equals("book")) {
-                passage.setBook(reader.nextString());
-            } else if (name.equals("chapter")) {
-                passage.setChapter(reader.nextString());
-            } else if (name.equals("startverse")) {
-                passage.setStartVerse(reader.nextString());
-            } else if (name.equals("endverse")) {
-                passage.setEndVerse(reader.nextString());
-            } else if (name.equals("text")) {
-                passage.setText(reader.nextString());
-            } else {
-                reader.skipValue();
-            }*/
-        }
-        reader.endObject();
-        return passage;
+        return memoryPassage;
     }
 
 }

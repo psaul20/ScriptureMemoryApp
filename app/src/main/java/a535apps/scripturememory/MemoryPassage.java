@@ -17,8 +17,8 @@ public class MemoryPassage{
     private int intEndVerse;
     private String strText;
 
-    public MemoryPassage(){
-            strPsgID = UUID.randomUUID().toString();
+    public MemoryPassage() {
+        strPsgID = UUID.randomUUID().toString();
     }
 
     public String getPsgID() {
@@ -29,23 +29,45 @@ public class MemoryPassage{
         this.strPsgID = strPsgID;
     }
 
-    public String getTranslation(){return strTranslation;}
-    public void setTranslation(String Translation) {strTranslation = Translation;}
+    public String getTranslation() {
+        return strTranslation;
+    }
 
-    public String getBook(){return strBook;}
-    public void setBook(String Book) {strBook = Book;}
+    public void setTranslation(String Translation) {
+        strTranslation = Translation;
+    }
 
-    public int getChapter(){return intChapter;}
+    public String getBook() {
+        return strBook;
+    }
+
+    public void setBook(String Book) {
+        strBook = Book;
+    }
+
+    public int getChapter() {
+        return intChapter;
+    }
+
     public void setChapter(int Chapter) {
-        intChapter = Chapter;}
+        intChapter = Chapter;
+    }
 
-    public int getStartVerse(){return intStartVerse;}
+    public int getStartVerse() {
+        return intStartVerse;
+    }
+
     public void setStartVerse(int StartVerse) {
-        intStartVerse = StartVerse;}
+        intStartVerse = StartVerse;
+    }
 
-    public int getEndVerse(){return intEndVerse;}
+    public int getEndVerse() {
+        return intEndVerse;
+    }
+
     public void setEndVerse(int EndVerse) {
-        intEndVerse = EndVerse;}
+        intEndVerse = EndVerse;
+    }
 
     public String getText() {
         return strText;
@@ -70,7 +92,7 @@ public class MemoryPassage{
 
     //could be useful for creating uniform file names when passages are written to JSON files
     //May not be used now that we are using SQLite for storage
-    public String toFileName (){
+    public String toFileName() {
         String strFileName = getPsgReference().replaceAll(" ","_");
         strFileName.replaceAll(":",".");
         return strFileName;
