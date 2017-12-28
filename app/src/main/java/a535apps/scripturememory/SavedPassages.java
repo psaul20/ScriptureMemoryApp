@@ -1,7 +1,6 @@
 package a535apps.scripturememory;
 
 import android.content.Intent;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -10,12 +9,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import a535apps.scripturememory.database.DBHelper;
 import a535apps.scripturememory.database.DataSource;
 
 public class SavedPassages extends AppCompatActivity {
@@ -47,11 +44,9 @@ public class SavedPassages extends AppCompatActivity {
 
         try {
 
-            SQLiteOpenHelper dbHelper = new DBHelper(this);
             //Automatically calls onCreate method if the database hasn't been created
             mDataSource = new DataSource(this);
             mDataSource.open();
-            Toast.makeText(this, "Database Acquired!", Toast.LENGTH_SHORT).show();
 
             getSavedPsgs();
 
@@ -81,7 +76,7 @@ public class SavedPassages extends AppCompatActivity {
         try {
             long numItems = mDataSource.getSavedPsgCount();
             if (numItems > 0 ){
-                //add saved passages to lstSavedPsgs
+                lstSavedPsgs = mDataSource.getAllItems();
             }
             else {
                 //Display View to entice user to add verses

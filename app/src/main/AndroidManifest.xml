@@ -24,7 +24,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".SavedPassages" />
         </activity>
-        <activity android:name=".MemoryExercise"></activity>
+        <activity android:name=".MemoryExercise"
+            android:parentActivityName=".SavedPassages">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".SavedPassages" />
+        </activity>
     </application>
     <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>

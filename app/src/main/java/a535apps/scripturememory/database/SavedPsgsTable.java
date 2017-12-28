@@ -14,6 +14,10 @@ public class SavedPsgsTable {
     public static final String COLUMN_ENDVERSE = "endVerse";
     public static final String COLUMN_TEXT = "text";
 
+    public static final String[] ALL_COLUMNS =
+            {COLUMN_ID, COLUMN_TRANSLATION, COLUMN_BOOK, COLUMN_CHAPTER,
+                    COLUMN_STARTVERSE, COLUMN_ENDVERSE, COLUMN_TEXT};
+
     public static final String SQL_CREATE =
             "CREATE TABLE " + TABLE_SAVEDPSGS + "(" +
                     COLUMN_ID + " TEXT PRIMARY KEY," +
