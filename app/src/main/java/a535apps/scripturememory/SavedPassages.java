@@ -20,9 +20,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
-
 import a535apps.scripturememory.database.DBHelper;
 import a535apps.scripturememory.database.DataSource;
+import a535apps.scripturememory.MemoryPassage;
 
 public class SavedPassages extends AppCompatActivity {
 
@@ -53,11 +53,9 @@ public class SavedPassages extends AppCompatActivity {
 
         try {
 
-            SQLiteOpenHelper dbHelper = new DBHelper(this);
             //Automatically calls onCreate method if the database hasn't been created
             mDataSource = new DataSource(this);
             mDataSource.open();
-            Toast.makeText(this, "Database Acquired!", Toast.LENGTH_SHORT).show();
 
             getSavedPsgs();
 
@@ -86,10 +84,16 @@ public class SavedPassages extends AppCompatActivity {
         try {
             long numItems = mDataSource.getSavedPsgCount();
             if (numItems > 0 ){
-                //add saved passages to lstSavedPsgs
+                lstSavedPsgs = mDataSource.getAllItems();
             }
             else {
+                MemoryPassage testPsg = new MemoryPassage("NIV", "John", 3, 16, 16, "For God so " +
+                "loved the earth that He gave his one and only son, that all who believe in him would not" +
+                " perish, but have eternal life.");
+                mDataSource.insertPsg(testPsg);
+                lstSavedPsgs = mDataSource.getAllItems();
                 //Display View to entice user to add verses
+
             }
         }
         catch (Exception e){

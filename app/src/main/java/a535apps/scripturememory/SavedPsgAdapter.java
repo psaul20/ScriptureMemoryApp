@@ -1,12 +1,13 @@
 package a535apps.scripturememory;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
 
     private List<MemoryPassage> lstSavedPsgs = new ArrayList<>();
     private Context mContext;
+    public static final String PSG_KEY = "psg_key";
 
     // Provide a suitable constructor (depends on the kind of dataset)
     public SavedPsgAdapter(Context context, List<MemoryPassage> DataSet) {
@@ -60,7 +62,7 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
-        MemoryPassage psg = lstSavedPsgs.get(position);
+        final MemoryPassage psg = lstSavedPsgs.get(position);
         // - replace the contents of the view with that element
         try {
             holder.txtPsgRef.setText(psg.getPsgReference());
@@ -73,6 +75,10 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
             @Override
             public void onClick(View v){
                 //Open new exercise activity, display text
+                Intent intent = new Intent(mContext, MemoryExercise.class);
+                intent.putExtra(PSG_KEY, psg);
+                mContext.startActivity(intent);
+
             }
         });
     }
