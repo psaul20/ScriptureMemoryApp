@@ -87,13 +87,7 @@ public class SavedPassages extends AppCompatActivity {
                 lstSavedPsgs = mDataSource.getAllItems();
             }
             else {
-                MemoryPassage testPsg = new MemoryPassage("NIV", "John", 3, 16, 16, "For God so " +
-                "loved the earth that He gave his one and only son, that all who believe in him would not" +
-                " perish, but have eternal life.");
-                mDataSource.insertPsg(testPsg);
-                lstSavedPsgs = mDataSource.getAllItems();
                 //Display View to entice user to add verses
-
             }
         }
         catch (Exception e){
