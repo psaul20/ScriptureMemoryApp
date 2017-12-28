@@ -49,8 +49,10 @@ public class AddVerse extends AppCompatActivity {
             con.connect();
             int responseCode = con.getResponseCode();
             InputStream inputStream;
+            boolean success = false;
             if (200 <= responseCode && responseCode <= 299) {
                 inputStream = con.getInputStream();
+                success = true;
             } else {
                 inputStream = con.getErrorStream();
             }
@@ -67,21 +69,25 @@ public class AddVerse extends AppCompatActivity {
 
             System.out.println("Response: " + response.toString());
 
-            // Convert response to JSON Object and parse for verse
-            MemoryPassage memoryPassage = new MemoryPassage();
-            memoryPassage.setStartVerse(Integer.parseInt(startVerse));
-            memoryPassage.setEndVerse(Integer.parseInt(endVerse));
-            memoryPassage.setTranslation(translation);
-            memoryPassage.setChapter(Integer.parseInt(chapter));
-            memoryPassage.setBook(book);
-            memoryPassage = JsonParser.readPassage(new JSONObject(response.toString()), memoryPassage);
-            return memoryPassage;
+            if(success) {
+                // Convert response to JSON Object and parse for verse
+                MemoryPassage memoryPassage = new MemoryPassage();
+                memoryPassage.setStartVerse(Integer.parseInt(startVerse));
+                memoryPassage.setEndVerse(Integer.parseInt(endVerse));
+                memoryPassage.setTranslation(translation);
+                memoryPassage.setChapter(Integer.parseInt(chapter));
+                memoryPassage.setBook(book);
+                memoryPassage = JsonParser.readPassage(new JSONObject(response.toString()), memoryPassage);
+                return memoryPassage;
+            } else {
+                return null;
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         } finally {
             con.disconnect();
         }
-        return null;
     }
 }
