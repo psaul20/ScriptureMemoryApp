@@ -15,7 +15,7 @@ import java.net.URL;
 
 public class AddVerse extends AppCompatActivity {
 
-    private final String bibleApiKey = "2DHrfilG08rAibeYoRIHvKm3CyWxIo74NYtR7wus";
+    private static final String BIBLE_API_KEY = "2DHrfilG08rAibeYoRIHvKm3CyWxIo74NYtR7wus";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +40,7 @@ public class AddVerse extends AppCompatActivity {
             URL url = new URL(query);
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
-            String userCredentials = bibleApiKey + ":X";
+            String userCredentials = BIBLE_API_KEY + ":X";
             String encodedCredentials = Base64.encodeToString(userCredentials.getBytes(), Base64.DEFAULT);
             con.setRequestProperty("Authorization", "Basic " + encodedCredentials);
             con.setRequestProperty("Content-Type", "application/json");

@@ -20,7 +20,7 @@ public class SavedPassages extends AppCompatActivity {
     private RecyclerView rcvSavedVerses;
     private RecyclerView.Adapter Adapter;
     private RecyclerView.LayoutManager llmVerseLayout;
-    private List<MemoryPassage> lstSavedPsgs = new ArrayList<>();
+    private List<MemoryPassage> lstSavedPsgs = new ArrayList<MemoryPassage>();
     DataSource mDataSource;
 
     @Override
@@ -34,7 +34,6 @@ public class SavedPassages extends AppCompatActivity {
         FloatingActionButton fabAddPsg = (FloatingActionButton) findViewById(R.id.fabAddVerse);
         fabAddPsg.setOnClickListener(new View.OnClickListener() {
             @Override
-
             public void onClick(View view) {
                 startActivity(new Intent(SavedPassages.this, AddVerse.class));
                 Snackbar.make(view, "Passage Saved", Snackbar.LENGTH_LONG)
