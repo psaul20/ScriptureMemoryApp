@@ -3,53 +3,183 @@ package a535apps.scripturememory;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 
-import org.json.JSONObject;
+import org.json.JSONArray;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 public class AddVerse extends AppCompatActivity {
 
-    private static final String BIBLE_API_KEY = "2DHrfilG08rAibeYoRIHvKm3CyWxIo74NYtR7wus";
+    private static final String BIBLE_API_KEY = "05f145575386971d2f9a4fafb4b27983";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_verse);
-
-        // Test API
-        MemoryPassage memPassage1 = getVerse("eng-KJVA","john", "3", "16", "17");
-        MemoryPassage memPassage2 = getVerse("eng-KJVA","1Samuel", "3", "1", "1");
-    }
-
-    public MemoryPassage getVerse(String translation, String book, String chapter, String startVerse, String endVerse){
-        String query = "https://bibles.org/v2/search.js?query=" + book + "+" + chapter
-                + ":" + startVerse + "-" + endVerse + "&version=" + translation;
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        HttpURLConnection con = null;
+        // Test API
+//        List<Language> testLanguages = getAvailableLanguages();
+//        for(Language lng : testLanguages) {
+//            System.out.println(lng.getLngCode() + "-" + lng.getLngName());
+//        }
+//        List<BibleVersion> testVersions = getAvailableBibleVersions("ENG");
+//        for(BibleVersion bibVersion : testVersions) {
+//            System.out.println(bibVersion.getLngCode() + ": " + bibVersion.getVersionCode() + "-" + bibVersion.getVersionName());
+//        }
+//        List<Book> testBooks = getAvailableBooks("ENG", "ESV");
+//        for(Book book : testBooks) {
+//            System.out.println(book.getDamId() + ": " + book.getBookName() + "(" + book.getBookId() + ") - " + book.getNumChapters());
+//        }
+        MemoryPassage testPassage = getVerses("ENGESVO", "John", 3, 16, 18);
+        if(testPassage != null) {
+            System.out.println(testPassage.getTranslation() + ": " + testPassage.getBook() + " " + testPassage.getChapter() + ":" + testPassage.getStartVerse() + "-" + testPassage.getEndVerse() + " " + testPassage.getText());
+        } else {
+            System.out.println("Null response...");
+        }
+    }
+
+    public List<Language> getAvailableLanguages() {
+        List<Language> languages = new ArrayList<>();
+        String query = "https://dbt.io/library/volumelanguagefamily?key=" + BIBLE_API_KEY + "&media=text&v=2";
+        String response = makeRequest(query);
+        if(response != null) {
+            try {
+                languages = JsonParser.readLanguages(new JSONArray(response));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return languages;
+    }
+
+    public List<BibleVersion> getAvailableBibleVersions(String lngCode) {
+        List<BibleVersion> bibleVersions = new ArrayList<>();
+        String query = "https://dbt.io/library/volume?key=" + BIBLE_API_KEY
+                + "&media=text&language_family_code=" + lngCode + "&v=2";
+        String response = makeRequest(query);
+        if(response != null) {
+            try {
+                bibleVersions = JsonParser.readBibleVersions(new JSONArray(response));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return bibleVersions;
+    }
+
+    public List<Book> getAvailableBooks(String lngCode, String versionCode) {
+        List<Book> books = new ArrayList<>();
+        String query = "https://dbt.io/library/book?key=" + BIBLE_API_KEY
+                + "&dam_id=" + lngCode + versionCode + "&v=2";
+        String response = makeRequest(query);
+        if(response != null) {
+            try {
+                books = JsonParser.readBooks(new JSONArray(response));
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return books;
+    }
+
+    public MemoryPassage getVerses(String damId, String bookId, int chapter, int startVerse, int endVerse) {
+        // Try with damId 1
+        String text = "";
+        String query = "https://dbt.io/text/verse?key=" + BIBLE_API_KEY
+                + "&dam_id=" + damId + "1ET&book_id=" + bookId + "&chapter_id="
+                + chapter + "&verse_start=" + startVerse + "&verse_end=" + endVerse + "&v=2";
+        String response = makeRequest(query);
+        if(response != null) {
+            try {
+                text = JsonParser.readVerses(new JSONArray(response));
+                if(!text.isEmpty()) {
+                    // Found verses. Create passage
+                    return new MemoryPassage(damId.substring(0, damId.length()-1),
+                            bookId, chapter, startVerse, endVerse, text);
+                } else {
+                    // // Could not find any verses. Try with damId 2
+                    query = "https://dbt.io/text/verse?key=" + BIBLE_API_KEY
+                            + "&dam_id=" + damId + "2ET&book_id=" + bookId + "&chapter_id="
+                            + chapter + "&verse_start=" + startVerse + "&verse_end=" + endVerse + "&v=2";
+                    response = makeRequest(query);
+                    if(response != null) {
+                        text = JsonParser.readVerses(new JSONArray(response));
+                        if (!text.isEmpty()) {
+                            // Found verses. Create passage
+                            return new MemoryPassage(damId.substring(0, damId.length() - 1),
+                                    bookId, chapter, startVerse, endVerse, text);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public String makeRequest(String query) {
+        HttpsURLConnection con = null;
+        boolean success = false;
+        StringBuilder response = new StringBuilder();
 
         try {
-            // Set HttpRequest Properties
+
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            // From https://www.washington.edu/itconnect/security/ca/load-der.crt
+            InputStream caInput = new BufferedInputStream(getAssets().open("bible.crt"));
+            Certificate ca;
+            try {
+                ca = cf.generateCertificate(caInput);
+                System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+            } finally {
+                caInput.close();
+            }
+
+            // Create a KeyStore containing our trusted CAs
+            String keyStoreType = KeyStore.getDefaultType();
+            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("ca", ca);
+
+            // Create a TrustManager that trusts the CAs in our KeyStore
+            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+            tmf.init(keyStore);
+
+            // Create an SSLContext that uses our TrustManager
+            SSLContext context = SSLContext.getInstance("TLS");
+            context.init(null, tmf.getTrustManagers(), null);
+
+
+            // Set HttpsRequest Properties
             URL url = new URL(query);
-            con = (HttpURLConnection) url.openConnection();
+            con = (HttpsURLConnection) url.openConnection();
             con.setRequestMethod("GET");
-            String userCredentials = BIBLE_API_KEY + ":X";
-            String encodedCredentials = Base64.encodeToString(userCredentials.getBytes(), Base64.DEFAULT);
-            con.setRequestProperty("Authorization", "Basic " + encodedCredentials);
             con.setRequestProperty("Content-Type", "application/json");
+            con.setSSLSocketFactory(context.getSocketFactory());
 
             // Connect and check for successful response
             con.connect();
             int responseCode = con.getResponseCode();
             InputStream inputStream;
-            boolean success = false;
+
             if (200 <= responseCode && responseCode <= 299) {
                 inputStream = con.getInputStream();
                 success = true;
@@ -59,7 +189,7 @@ public class AddVerse extends AppCompatActivity {
 
             // Collect response as String
             BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuilder response = new StringBuilder();
+
             String currentLine;
             while ((currentLine = in.readLine()) != null) {
                 response.append(currentLine);
@@ -69,25 +199,17 @@ public class AddVerse extends AppCompatActivity {
 
             System.out.println("Response: " + response.toString());
 
-            if(success) {
-                // Convert response to JSON Object and parse for verse
-                MemoryPassage memoryPassage = new MemoryPassage();
-                memoryPassage.setStartVerse(Integer.parseInt(startVerse));
-                memoryPassage.setEndVerse(Integer.parseInt(endVerse));
-                memoryPassage.setTranslation(translation);
-                memoryPassage.setChapter(Integer.parseInt(chapter));
-                memoryPassage.setBook(book);
-                memoryPassage = JsonParser.readPassage(new JSONObject(response.toString()), memoryPassage);
-                return memoryPassage;
-            } else {
-                return null;
-            }
-
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         } finally {
             con.disconnect();
         }
+
+        if(success) {
+            return response.toString();
+        } else {
+            return null;
+        }
     }
+
 }
