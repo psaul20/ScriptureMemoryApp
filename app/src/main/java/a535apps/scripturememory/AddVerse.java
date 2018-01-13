@@ -22,9 +22,13 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
+import a535apps.scripturememory.database.DataSource;
+
 public class AddVerse extends AppCompatActivity {
 
     private static final String BIBLE_API_KEY = "05f145575386971d2f9a4fafb4b27983";
+
+    private DataSource mDataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +50,15 @@ public class AddVerse extends AppCompatActivity {
 //        for(Book book : testBooks) {
 //            System.out.println(book.getDamId() + ": " + book.getBookName() + "(" + book.getBookId() + ") - " + book.getNumChapters());
 //        }
-        MemoryPassage testPassage = getVerses("ENGESVO", "John", 3, 16, 18);
+
+        // This inserts a test verse every time the '+' fab is pressed
+        mDataSource = new DataSource(this);
+        mDataSource.open();
+
+        MemoryPassage testPassage = getVerses("ENGESVN", "John", 4, 14, 15);
         if(testPassage != null) {
             System.out.println(testPassage.getTranslation() + ": " + testPassage.getBook() + " " + testPassage.getChapter() + ":" + testPassage.getStartVerse() + "-" + testPassage.getEndVerse() + " " + testPassage.getText());
+            mDataSource.insertPsg(testPassage);
         } else {
             System.out.println("Null response...");
         }

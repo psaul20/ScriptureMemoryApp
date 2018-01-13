@@ -18,10 +18,10 @@ import a535apps.scripturememory.database.DataSource;
 public class SavedPassages extends AppCompatActivity {
 
     private RecyclerView rcvSavedVerses;
-    private RecyclerView.Adapter Adapter;
+    private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager llmVerseLayout;
     private List<MemoryPassage> lstSavedPsgs = new ArrayList<MemoryPassage>();
-    DataSource mDataSource;
+    private DataSource mDataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +59,8 @@ public class SavedPassages extends AppCompatActivity {
             rcvSavedVerses.setLayoutManager(llmVerseLayout);
 
             //Declare and specify adapter for RecyclerView. See SavedVerseAdapter Class
-            Adapter = new SavedPsgAdapter(this, lstSavedPsgs);
-            rcvSavedVerses.setAdapter(Adapter);
+            adapter = new SavedPsgAdapter(this, lstSavedPsgs);
+            rcvSavedVerses.setAdapter(adapter);
 
         }
         catch (Exception e)
@@ -79,6 +79,7 @@ public class SavedPassages extends AppCompatActivity {
             }
             else {
                 //Display View to entice user to add verses
+                System.out.println("NO SAVED PASSAGES");
             }
         }
         catch (Exception e){

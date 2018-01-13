@@ -28,10 +28,12 @@ public class DataSource {
 
     public void open(){
         mDatabase = mdbHelper.getWritableDatabase();
+        System.out.println("DB OPENED");
     }
 
     public void close(){
         mdbHelper.close();
+        System.out.println("DB CLOSED");
     }
 
     public void insertPsg(MemoryPassage psg){
