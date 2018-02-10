@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -21,16 +22,30 @@ public class MemoryExercise extends AppCompatActivity {
     LinearLayout llPsgLine3;
     LinearLayout llPsgLine4;*/
 
-    ConstraintLayout clPsgDisplay = (ConstraintLayout) findViewById(R.id.clPsgDisplay);
-    ConstraintSet csPsgDisplay = new ConstraintSet();
+    ArrayList<String> psgWords;
 
-    ConstraintLayout clWordBankDisplay = (ConstraintLayout) findViewById(R.id.clWordBankDisplay);
-    ConstraintSet csWordBankDisplay = new ConstraintSet();
+    ConstraintLayout clPsgDisplay;
+    ConstraintSet csPsgDisplay;
+
+    ConstraintLayout clWordBankDisplay;
+    ConstraintSet csWordBankDisplay;
+
+    int intRemainingDps;
+    int intTopMargin;
+    TextView txtView;
+    TextView txtPrevView;
+    boolean blnNewLine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_memory_exercise);
+
+        clPsgDisplay = (ConstraintLayout) findViewById(R.id.clPsgDisplay);
+        csPsgDisplay = new ConstraintSet();
+
+        clWordBankDisplay = (ConstraintLayout) findViewById(R.id.clWordBankDisplay);
+        csWordBankDisplay = new ConstraintSet();
 
         /*llPsgLine1 = (LinearLayout) findViewById(R.id.llPsgLine1);
         llPsgLine1 = (LinearLayout) findViewById(R.id.llPsgLine2);
@@ -42,8 +57,7 @@ public class MemoryExercise extends AppCompatActivity {
         testWords.add("world");
         testWords.add("perish");
 
-        ArrayList<String> psgWords = new ArrayList<>();
-
+        psgWords = new ArrayList<>();
 
         MemoryPassage psg = getIntent().getExtras().getParcelable(SavedPsgAdapter.PSG_KEY);
         if (psg != null)
@@ -61,24 +75,34 @@ public class MemoryExercise extends AppCompatActivity {
                 }
             }
 
-            CreatePsgTextViews(psgWords);
+            ViewTreeObserver vto = clPsgDisplay.getViewTreeObserver();
+            vto.addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    clPsgDisplay.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    int intScreenWidth  = clPsgDisplay.getMeasuredWidth();
+                    int height = clPsgDisplay.getMeasuredHeight();
 
+                    CreatePsgTextViews(psgWords, intScreenWidth);
+
+                }
+            });
 
         }
 
     }
 
-    protected void CreatePsgTextViews (ArrayList<String> words){
+    protected void CreatePsgTextViews (ArrayList<String> words, int screenwidth){
 
         //Does this work?
-        clPsgDisplay.measure(0,0);
-        int intRemainingDps = clPsgDisplay.getMeasuredWidth();
-        int intTopMargin = 10;
-        TextView txtPrevView = new TextView(this);
-        boolean blnNewLine = true;
+       /* clPsgDisplay.measure(0,0);
+        int intRemainingDps = clPsgDisplay.getMeasuredWidth();*/
+        intRemainingDps = screenwidth;
+        intTopMargin = 10;
+        blnNewLine = true;
 
         for (String word : words){
-            TextView txtView = new TextView(this);
+            txtView = new TextView(this);
             if(!word.equals("+")){
                 txtView.setText(word);
             }
@@ -90,9 +114,6 @@ public class MemoryExercise extends AppCompatActivity {
             csPsgDisplay.clone(clPsgDisplay);
             csPsgDisplay.constrainHeight(txtView.getId(), ConstraintSet.WRAP_CONTENT);
             csPsgDisplay.constrainWidth(txtView.getId(), ConstraintSet.WRAP_CONTENT);
-
-            //calculate remaining DPs
-            //if insufficient DPs remain, create horizontal chain with existing TextViews
 
             if(blnNewLine){
                 csPsgDisplay.connect(txtView.getId(),ConstraintSet.LEFT,
@@ -106,8 +127,29 @@ public class MemoryExercise extends AppCompatActivity {
             csPsgDisplay.connect(txtView.getId(),ConstraintSet.TOP,
                     ConstraintSet.PARENT_ID, ConstraintSet.TOP, intTopMargin);
 
-            //Does this work?
-            txtView.measure(0,0);
+            csPsgDisplay.applyTo(clPsgDisplay);
+
+//            ViewTreeObserver vto2 = txtView.getViewTreeObserver();
+//            vto2.addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
+//                @Override
+//                public void onGlobalLayout() {
+//                    txtPrevView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+//
+//                    //Does this work?
+//                    intRemainingDps = intRemainingDps - (txtView.getMeasuredWidth() + 5);
+//
+//                    if (intRemainingDps <= 0) {
+//                        blnNewLine = true;
+//                        intTopMargin += 10;
+//                        intRemainingDps = clPsgDisplay.getMeasuredWidth();
+//                    }
+//                    else
+//                        blnNewLine = false;
+//
+//                    txtPrevView = txtView;
+//                }
+//            });
+
             intRemainingDps = intRemainingDps - (txtView.getMeasuredWidth() + 5);
 
             if (intRemainingDps <= 0) {
@@ -118,9 +160,8 @@ public class MemoryExercise extends AppCompatActivity {
             else
                 blnNewLine = false;
 
-            txtPrevView = txtView;
         }
-
     }
-
 }
+
+

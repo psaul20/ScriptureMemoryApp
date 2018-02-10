@@ -20,7 +20,7 @@ public class SavedPassages extends AppCompatActivity {
     private RecyclerView rcvSavedVerses;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager llmVerseLayout;
-    private List<MemoryPassage> lstSavedPsgs = new ArrayList<MemoryPassage>();
+    private List<MemoryPassage> lstSavedPsgs = new ArrayList<>();
     private DataSource mDataSource;
 
     @Override
