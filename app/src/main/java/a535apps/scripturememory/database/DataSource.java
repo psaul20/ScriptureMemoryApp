@@ -24,15 +24,16 @@ public class DataSource {
     public DataSource(Context context) {
         this.mContext = context;
         mdbHelper = new DBHelper(mContext);
-        mDatabase = mdbHelper.getWritableDatabase();
     }
 
     public void open(){
         mDatabase = mdbHelper.getWritableDatabase();
+        System.out.println("DB OPENED");
     }
 
     public void close(){
         mdbHelper.close();
+        System.out.println("DB CLOSED");
     }
 
     public void insertPsg(MemoryPassage psg){
@@ -50,7 +51,7 @@ public class DataSource {
         //Equivalent to Java resultset class
         //Sorts and filters can be implemented using the additional parameters
         //See "Filter and sort Data lesson" in Local Data Storage video for implementing filters
-        Cursor cursor = mDatabase.query(SavedPsgsTable.TABLE_SAVEDPSGS,SavedPsgsTable.ALL_COLUMNS, null, null, null, null, null);
+        Cursor cursor = mDatabase.query(SavedPsgsTable.TABLE_SAVEDPSGS, SavedPsgsTable.ALL_COLUMNS, null, null, null, null, null);
 
         while(cursor.moveToNext()){
             MemoryPassage psg = new MemoryPassage();

@@ -21,6 +21,8 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
 
     private List<MemoryPassage> lstSavedPsgs = new ArrayList<>();
     private Context mContext;
+
+    //set generic constant to store psg on click with intent.putExtra
     public static final String PSG_KEY = "psg_key";
 
     // Provide a suitable constructor (depends on the kind of dataset)
@@ -38,10 +40,15 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
         //used for click event
         public View mView;
 
+        //ViewHolder constructor
         public ViewHolder(View savedPsgView) {
+
             super(savedPsgView);
 
+            //give txtPsgRef attributes of TextView from inflated view model
             txtPsgRef = (TextView) savedPsgView.findViewById(R.id.txtPsgRefText);
+
+            //make entire inflated view model into clickable view
             mView = savedPsgView;
         }
     }
@@ -49,10 +56,10 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
     // Create new views (invoked by the layout manager)
     @Override
     public SavedPsgAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // create a new view
+        // create a new view by inflating from pre defined view model
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View savedPsgView = inflater.inflate(R.layout.saved_verse_view_model, parent, false);
-        // set the view's size, margins, paddings and layout parameters
+        // option to set the view's size, margins, paddings and layout parameters
         //...
         return new ViewHolder(savedPsgView);
 
@@ -63,7 +70,7 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
         final MemoryPassage psg = lstSavedPsgs.get(position);
-        // - replace the contents of the view with that element
+        // - replace the contents of the view with given passage
         try {
             holder.txtPsgRef.setText(psg.getPsgReference());
         }

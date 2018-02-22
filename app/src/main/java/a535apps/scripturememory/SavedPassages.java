@@ -1,36 +1,27 @@
 package a535apps.scripturememory;
 
-import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.TextView;
-import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.List;
-import a535apps.scripturememory.database.DBHelper;
+
 import a535apps.scripturememory.database.DataSource;
-import a535apps.scripturememory.MemoryPassage;
 
 public class SavedPassages extends AppCompatActivity {
 
     private RecyclerView rcvSavedVerses;
-    private RecyclerView.Adapter Adapter;
+    private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager llmVerseLayout;
     private List<MemoryPassage> lstSavedPsgs = new ArrayList<>();
-    DataSource mDataSource;
+    private DataSource mDataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +34,6 @@ public class SavedPassages extends AppCompatActivity {
         FloatingActionButton fabAddPsg = (FloatingActionButton) findViewById(R.id.fabAddVerse);
         fabAddPsg.setOnClickListener(new View.OnClickListener() {
             @Override
-
             public void onClick(View view) {
                 startActivity(new Intent(SavedPassages.this, AddVerse.class));
                 Snackbar.make(view, "Passage Saved", Snackbar.LENGTH_LONG)
@@ -69,13 +59,14 @@ public class SavedPassages extends AppCompatActivity {
             rcvSavedVerses.setLayoutManager(llmVerseLayout);
 
             //Declare and specify adapter for RecyclerView. See SavedVerseAdapter Class
-            Adapter = new SavedPsgAdapter(this, lstSavedPsgs);
-            rcvSavedVerses.setAdapter(Adapter);
+            adapter = new SavedPsgAdapter(this, lstSavedPsgs);
+            rcvSavedVerses.setAdapter(adapter);
 
         }
         catch (Exception e)
         {
             //Exception Handling
+            e.printStackTrace();
         }
 
     }
@@ -87,13 +78,8 @@ public class SavedPassages extends AppCompatActivity {
                 lstSavedPsgs = mDataSource.getAllItems();
             }
             else {
-                MemoryPassage testPsg = new MemoryPassage("NIV", "John", 3, 16, 16, "For God so " +
-                "loved the earth that He gave his one and only son, that all who believe in him would not" +
-                " perish, but have eternal life.");
-                mDataSource.insertPsg(testPsg);
-                lstSavedPsgs = mDataSource.getAllItems();
                 //Display View to entice user to add verses
-
+                System.out.println("NO SAVED PASSAGES");
             }
         }
         catch (Exception e){
