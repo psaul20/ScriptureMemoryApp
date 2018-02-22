@@ -28,6 +28,7 @@
 
     </android.support.constraint.ConstraintLayout>
 
+    <!--May not be resource efficient to have 2 ConstraintLayouts-->
     <android.support.constraint.ConstraintLayout
         android:id="@+id/clWordBankDisplay"
         android:layout_width="0dp"

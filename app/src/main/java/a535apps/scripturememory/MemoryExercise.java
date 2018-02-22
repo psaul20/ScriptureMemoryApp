@@ -32,8 +32,9 @@ public class MemoryExercise extends AppCompatActivity {
 
     int intRemainingDps;
     int intTopMargin;
+    int intLeftMargin;
     TextView txtView;
-    TextView txtPrevView;
+    int intPrevViewId;
     boolean blnNewLine;
 
     @Override
@@ -99,10 +100,13 @@ public class MemoryExercise extends AppCompatActivity {
         int intRemainingDps = clPsgDisplay.getMeasuredWidth();*/
         intRemainingDps = screenwidth;
         intTopMargin = 10;
+        intLeftMargin = 10;
         blnNewLine = true;
 
         for (String word : words){
             txtView = new TextView(this);
+            txtView.setId(View.generateViewId());
+            txtView.setTextSize(50);
             if(!word.equals("+")){
                 txtView.setText(word);
             }
@@ -117,11 +121,11 @@ public class MemoryExercise extends AppCompatActivity {
 
             if(blnNewLine){
                 csPsgDisplay.connect(txtView.getId(),ConstraintSet.LEFT,
-                        ConstraintSet.PARENT_ID, ConstraintSet.LEFT, 5);
+                        ConstraintSet.PARENT_ID, ConstraintSet.LEFT, intLeftMargin);
             }
             else {
                 csPsgDisplay.connect(txtView.getId(),ConstraintSet.LEFT,
-                        txtPrevView.getId(), ConstraintSet.RIGHT, 5);
+                        intPrevViewId, ConstraintSet.RIGHT, intLeftMargin);
             }
 
             csPsgDisplay.connect(txtView.getId(),ConstraintSet.TOP,
@@ -150,15 +154,18 @@ public class MemoryExercise extends AppCompatActivity {
 //                }
 //            });
 
-            intRemainingDps = intRemainingDps - (txtView.getMeasuredWidth() + 5);
+            intRemainingDps = intRemainingDps - (txtView.getMeasuredWidth() + intLeftMargin);
 
             if (intRemainingDps <= 0) {
                 blnNewLine = true;
                 intTopMargin += 10;
                 intRemainingDps = clPsgDisplay.getMeasuredWidth();
             }
-            else
+            else {
                 blnNewLine = false;
+            }
+
+            intPrevViewId = txtView.getId();
 
         }
     }
