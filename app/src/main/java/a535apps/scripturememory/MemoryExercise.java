@@ -11,47 +11,26 @@ import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.flexbox.FlexboxLayout;
+
 import java.util.ArrayList;
 
 import a535apps.scripturememory.MemoryPassage;
 
 public class MemoryExercise extends AppCompatActivity {
 
-/*    LinearLayout llPsgLine1;
-    LinearLayout llPsgLine2;
-    LinearLayout llPsgLine3;
-    LinearLayout llPsgLine4;*/
-
     ArrayList<String> psgWords;
 
-    ConstraintLayout clPsgDisplay;
-    ConstraintSet csPsgDisplay;
+    FlexboxLayout fbLayout;
 
-    ConstraintLayout clWordBankDisplay;
-    ConstraintSet csWordBankDisplay;
-
-    int intRemainingDps;
-    int intTopMargin;
-    int intLeftMargin;
     TextView txtView;
-    int intPrevViewId;
-    boolean blnNewLine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_memory_exercise);
 
-        clPsgDisplay = (ConstraintLayout) findViewById(R.id.clPsgDisplay);
-        csPsgDisplay = new ConstraintSet();
-
-        clWordBankDisplay = (ConstraintLayout) findViewById(R.id.clWordBankDisplay);
-        csWordBankDisplay = new ConstraintSet();
-
-        /*llPsgLine1 = (LinearLayout) findViewById(R.id.llPsgLine1);
-        llPsgLine1 = (LinearLayout) findViewById(R.id.llPsgLine2);
-        llPsgLine1 = (LinearLayout) findViewById(R.id.llPsgLine3);
-        llPsgLine1 = (LinearLayout) findViewById(R.id.llPsgLine4);*/
+        fbLayout = (FlexboxLayout) findViewById(R.id.fbLayout);
 
         ArrayList<String> testWords = new ArrayList<>(1);
         testWords.add("god");
@@ -68,45 +47,31 @@ public class MemoryExercise extends AppCompatActivity {
                 psgWords.add(word);
             }
 
-            for(String word : psgWords){
+            //should this logic be moved to createpsgtextviews method?
+            for(int i = 0; i < psgWords.size(); i++ ){
                 for(String checkWord : testWords){
-                    if(word.toUpperCase().equals(checkWord.toUpperCase()) ){
-                        word = "+";
+                    if(psgWords.get(i).toUpperCase().equals(checkWord.toUpperCase()) ){
+                        psgWords.set(i,"+");
                     }
                 }
             }
-
-            ViewTreeObserver vto = clPsgDisplay.getViewTreeObserver();
-            vto.addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    clPsgDisplay.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    int intScreenWidth  = clPsgDisplay.getMeasuredWidth();
-                    int height = clPsgDisplay.getMeasuredHeight();
-
-                    CreatePsgTextViews(psgWords, intScreenWidth);
-
-                }
-            });
-
         }
+
+        CreatePsgTextViews(psgWords);
 
     }
 
-    protected void CreatePsgTextViews (ArrayList<String> words, int screenwidth){
-
-        //Does this work?
-       /* clPsgDisplay.measure(0,0);
-        int intRemainingDps = clPsgDisplay.getMeasuredWidth();*/
-        intRemainingDps = screenwidth;
-        intTopMargin = 10;
-        intLeftMargin = 10;
-        blnNewLine = true;
+    protected void CreatePsgTextViews (ArrayList<String> words){
 
         for (String word : words){
             txtView = new TextView(this);
-            txtView.setId(View.generateViewId());
-            txtView.setTextSize(50);
+
+            txtView.setTextSize(30);
+            FlexboxLayout.MarginLayoutParams lp = new FlexboxLayout.MarginLayoutParams(ViewGroup.MarginLayoutParams.WRAP_CONTENT,ViewGroup.MarginLayoutParams.WRAP_CONTENT);
+            lp.setMargins(100,100,100,0);
+
+            txtView.setLayoutParams(lp);
+
             if(!word.equals("+")){
                 txtView.setText(word);
             }
@@ -114,58 +79,7 @@ public class MemoryExercise extends AppCompatActivity {
                 txtView.setText(R.string.blank_space);
             }
 
-            clPsgDisplay.addView(txtView);
-            csPsgDisplay.clone(clPsgDisplay);
-            csPsgDisplay.constrainHeight(txtView.getId(), ConstraintSet.WRAP_CONTENT);
-            csPsgDisplay.constrainWidth(txtView.getId(), ConstraintSet.WRAP_CONTENT);
-
-            if(blnNewLine){
-                csPsgDisplay.connect(txtView.getId(),ConstraintSet.LEFT,
-                        ConstraintSet.PARENT_ID, ConstraintSet.LEFT, intLeftMargin);
-            }
-            else {
-                csPsgDisplay.connect(txtView.getId(),ConstraintSet.LEFT,
-                        intPrevViewId, ConstraintSet.RIGHT, intLeftMargin);
-            }
-
-            csPsgDisplay.connect(txtView.getId(),ConstraintSet.TOP,
-                    ConstraintSet.PARENT_ID, ConstraintSet.TOP, intTopMargin);
-
-            csPsgDisplay.applyTo(clPsgDisplay);
-
-//            ViewTreeObserver vto2 = txtView.getViewTreeObserver();
-//            vto2.addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
-//                @Override
-//                public void onGlobalLayout() {
-//                    txtPrevView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-//
-//                    //Does this work?
-//                    intRemainingDps = intRemainingDps - (txtView.getMeasuredWidth() + 5);
-//
-//                    if (intRemainingDps <= 0) {
-//                        blnNewLine = true;
-//                        intTopMargin += 10;
-//                        intRemainingDps = clPsgDisplay.getMeasuredWidth();
-//                    }
-//                    else
-//                        blnNewLine = false;
-//
-//                    txtPrevView = txtView;
-//                }
-//            });
-
-            intRemainingDps = intRemainingDps - (txtView.getMeasuredWidth() + intLeftMargin);
-
-            if (intRemainingDps <= 0) {
-                blnNewLine = true;
-                intTopMargin += 10;
-                intRemainingDps = clPsgDisplay.getMeasuredWidth();
-            }
-            else {
-                blnNewLine = false;
-            }
-
-            intPrevViewId = txtView.getId();
+            fbLayout.addView(txtView);
 
         }
     }
