@@ -6,5 +6,65 @@
     android:layout_height="match_parent"
     tools:context="a535apps.scripturememory.AddVerse">
 
+    <AutoCompleteTextView
+        android:id="@+id/languageSelect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="6dp"
+        android:hint="Language"
+        app:layout_constraintBottom_toTopOf="@+id/versionSelect"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <AutoCompleteTextView
+        android:id="@+id/versionSelect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="14dp"
+        android:layout_marginTop="15dp"
+        android:hint="Bible Version"
+        app:layout_constraintBottom_toTopOf="@+id/bookSelect"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/languageSelect" />
+
+    <AutoCompleteTextView
+        android:id="@+id/bookSelect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="17dp"
+        android:layout_marginTop="14dp"
+        android:hint="Book"
+        app:layout_constraintBottom_toTopOf="@+id/chapterSelect"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/versionSelect" />
+
+    <AutoCompleteTextView
+        android:id="@+id/chapterSelect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="318dp"
+        android:layout_marginTop="16dp"
+        android:hint="Chapter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bookSelect" />
+
+    <AutoCompleteTextView
+        android:id="@+id/verseSelect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="241dp"
+        android:layout_marginTop="25dp"
+        android:hint="Verse"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chapterSelect" />
 
 </android.support.constraint.ConstraintLayout>
