@@ -25,7 +25,6 @@ public class JsonParser {
                 currentLanguage.setLngName(currentObject.getString("language_family_name").trim());
                 languages.add(currentLanguage);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -48,7 +47,6 @@ public class JsonParser {
                     encounteredVersions.add(versionCode);
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -67,21 +65,33 @@ public class JsonParser {
                 currentBook.setNumChapters(Integer.parseInt(currentObject.getString("number_of_chapters").trim()));
                 books.add(currentBook);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         return books;
     }
 
-    public static String readVerses(JSONArray response) {
+    public static List<Integer> readVerses(JSONObject response, String book_id, int chapter) {
+        List<Integer> verses = new ArrayList<>();
+        try {
+            JSONObject bookObject = response.getJSONObject(book_id);
+            JSONArray verseArray = bookObject.getJSONArray(Integer.toString(chapter));
+            for(int i = 0; i < verseArray.length(); ++i) {
+                verses.add(Integer.parseInt((String)verseArray.get(i)));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return verses;
+    }
+
+    public static String readPassage(JSONArray response) {
         String verseText = "";
         try {
             for(int i = 0; i < response.length(); ++i) {
                 JSONObject currentObject = response.getJSONObject(i);
                 verseText += currentObject.getString("verse_text").trim() + " ";
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

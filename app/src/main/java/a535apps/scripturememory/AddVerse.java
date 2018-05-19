@@ -3,8 +3,13 @@ package a535apps.scripturememory;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -16,7 +21,9 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -29,6 +36,12 @@ public class AddVerse extends AppCompatActivity {
     private static final String BIBLE_API_KEY = "05f145575386971d2f9a4fafb4b27983";
 
     private DataSource mDataSource;
+
+    private String selectedLngCode;
+    private String selectedVersionCode;
+    private String selectedBookName;
+    private Integer selectedChapter;
+    private Map<String, Book> mapNameToBook;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,13 +68,102 @@ public class AddVerse extends AppCompatActivity {
         mDataSource = new DataSource(this);
         mDataSource.open();
 
-        MemoryPassage testPassage = getVerses("ENGESVN", "John", 4, 14, 15);
-        if(testPassage != null) {
-            System.out.println(testPassage.getTranslation() + ": " + testPassage.getBook() + " " + testPassage.getChapter() + ":" + testPassage.getStartVerse() + "-" + testPassage.getEndVerse() + " " + testPassage.getText());
-            mDataSource.insertPsg(testPassage);
-        } else {
-            System.out.println("Null response...");
+        // Set selectors
+        final AutoCompleteTextView languageSelector = (AutoCompleteTextView) findViewById(R.id.languageSelect);
+        final AutoCompleteTextView versionSelector = (AutoCompleteTextView) findViewById(R.id.versionSelect);
+        final AutoCompleteTextView bookSelector = (AutoCompleteTextView) findViewById(R.id.bookSelect);
+        final AutoCompleteTextView chapterSelector = (AutoCompleteTextView) findViewById(R.id.chapterSelect);
+        final AutoCompleteTextView verseSelector = (AutoCompleteTextView) findViewById(R.id.verseSelect);
+
+        languageSelector.setThreshold(1);
+        versionSelector.setThreshold(1);
+        bookSelector.setThreshold(1);
+        chapterSelector.setThreshold(1);
+        verseSelector.setThreshold(1);
+
+        mapNameToBook = new HashMap<>();
+
+        // language adapter and pre-filled options
+        List<Language> availableLanguages = getAvailableLanguages();
+        List<String> languages = new ArrayList<>();
+        for (Language language : availableLanguages) {
+            languages.add(language.getLngName() + " - " + language.getLngCode());
         }
+        ArrayAdapter languageAdapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1, languages);
+        languageSelector.setAdapter(languageAdapter);
+
+        // set bible version options when language is set
+        languageSelector.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selectedLang = (String)parent.getItemAtPosition(position);
+                selectedLngCode = selectedLang.substring(selectedLang.indexOf('-')+1).trim();
+                List<BibleVersion> availableVersions = getAvailableBibleVersions(selectedLngCode);
+                List<String> versions = new ArrayList<>();
+                for (BibleVersion version : availableVersions) {
+                    versions.add(version.getVersionName() + " - " + version.getVersionCode());
+                }
+                ArrayAdapter versionAdapter = new ArrayAdapter(AddVerse.this ,android.R.layout.simple_list_item_1, versions);
+                versionSelector.setAdapter(versionAdapter);
+            }
+        });
+
+        versionSelector.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selectedVersion = (String)parent.getItemAtPosition(position);
+                selectedVersionCode = selectedVersion.substring(selectedVersion.indexOf('-')+1).trim();
+                List<Book> availableBooks = getAvailableBooks(selectedLngCode, selectedVersionCode);
+                mapNameToBook.clear();
+                for (Book book : availableBooks) {
+                    mapNameToBook.put(book.getBookName(), book);
+                }
+                ArrayAdapter bookAdapter = new ArrayAdapter(AddVerse.this ,android.R.layout.simple_list_item_1, mapNameToBook.keySet().toArray());
+                bookSelector.setAdapter(bookAdapter);
+            }
+        });
+
+        bookSelector.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectedBookName = (String)parent.getItemAtPosition(position);
+                int numChaptersAvailable = mapNameToBook.get(selectedBookName).getNumChapters();
+                List<Integer> chapters = new ArrayList<>();
+                for (int i = 1; i <= numChaptersAvailable; ++i) {
+                    chapters.add(i);
+                }
+                ArrayAdapter chapterAdapter = new ArrayAdapter(AddVerse.this ,android.R.layout.simple_list_item_1, chapters);
+                chapterSelector.setAdapter(chapterAdapter);
+            }
+        });
+
+        chapterSelector.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectedChapter = (Integer) parent.getItemAtPosition(position);
+                String selectedBookId = mapNameToBook.get(selectedBookName).getBookId();
+                String damId = mapNameToBook.get(selectedBookName).getDamId();
+                List<Integer> verses = getAvailableVerses(damId, selectedBookId, selectedChapter);
+
+                ArrayAdapter verseAdapter = new ArrayAdapter(AddVerse.this ,android.R.layout.simple_list_item_1, verses);
+                verseSelector.setAdapter(verseAdapter);
+            }
+        });
+
+        verseSelector.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                int selectedVerse = (Integer) parent.getItemAtPosition(position);
+                String selectedBookId = mapNameToBook.get(selectedBookName).getBookId();
+                String damId = mapNameToBook.get(selectedBookName).getDamId();
+                MemoryPassage passage = getPassage(damId, selectedBookId, selectedChapter, selectedVerse,selectedVerse);
+
+                if(passage != null) {
+                    mDataSource.insertPsg(passage);
+                }
+            }
+        });
+
     }
 
     public List<Language> getAvailableLanguages() {
@@ -108,7 +210,33 @@ public class AddVerse extends AppCompatActivity {
         return books;
     }
 
-    public MemoryPassage getVerses(String damId, String bookId, int chapter, int startVerse, int endVerse) {
+    public List<Integer> getAvailableVerses(String damId, String bookId, int chapter) {
+        List<Integer> verses = new ArrayList<>();
+        String query = "https://dbt.io/library/verseinfo?key=" + BIBLE_API_KEY
+                + "&dam_id=" + damId + "1ET&book_id=" + bookId + "&chapter_id=" + chapter + "&v=2";
+        String response = makeRequest(query);
+        if(response != null) {
+            try {
+                if (!response.startsWith("[")) {
+                    verses = JsonParser.readVerses(new JSONObject(response), bookId, chapter);
+                }
+                if (verses.isEmpty()) {
+                    // // Could not find any verses. Try with damId 2
+                    query = "https://dbt.io/library/verseinfo?key=" + BIBLE_API_KEY
+                            + "&dam_id=" + damId + "2ET&book_id=" + bookId + "&chapter_id=" + chapter + "&v=2";
+                    response = makeRequest(query);
+                    if (response != null && !response.startsWith("[")) {
+                        verses = JsonParser.readVerses(new JSONObject(response), bookId, chapter);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return verses;
+    }
+
+    public MemoryPassage getPassage(String damId, String bookId, int chapter, int startVerse, int endVerse) {
         // Try with damId 1
         String text = "";
         String query = "https://dbt.io/text/verse?key=" + BIBLE_API_KEY
@@ -117,7 +245,7 @@ public class AddVerse extends AppCompatActivity {
         String response = makeRequest(query);
         if(response != null) {
             try {
-                text = JsonParser.readVerses(new JSONArray(response));
+                text = JsonParser.readPassage(new JSONArray(response));
                 if(!text.isEmpty()) {
                     // Found verses. Create passage
                     return new MemoryPassage(damId.substring(0, damId.length()-1),
@@ -129,7 +257,7 @@ public class AddVerse extends AppCompatActivity {
                             + chapter + "&verse_start=" + startVerse + "&verse_end=" + endVerse + "&v=2";
                     response = makeRequest(query);
                     if(response != null) {
-                        text = JsonParser.readVerses(new JSONArray(response));
+                        text = JsonParser.readPassage(new JSONArray(response));
                         if (!text.isEmpty()) {
                             // Found verses. Create passage
                             return new MemoryPassage(damId.substring(0, damId.length() - 1),
