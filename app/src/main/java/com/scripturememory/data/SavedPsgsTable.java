@@ -2,8 +2,8 @@ package com.scripturememory.data;
 
 /**
  * Created by Patrick on 12/26/2017.
+ * This contains the Saved Passages Table information
  */
-
 public class SavedPsgsTable {
     public static final String TABLE_SAVEDPSGS = "savedPsgs";
     public static final String COLUMN_ID = "verseId";
@@ -27,6 +27,7 @@ public class SavedPsgsTable {
                     COLUMN_STARTVERSE + " INTEGER," +
                     COLUMN_ENDVERSE + " INTEGER," +
                     COLUMN_TEXT + " TEXT" + ");";
+
     public static final String SQL_DELETE =
             "DROP TABLE " + TABLE_SAVEDPSGS;
 }

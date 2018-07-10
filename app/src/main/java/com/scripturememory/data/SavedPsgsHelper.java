@@ -8,14 +8,14 @@ import android.database.sqlite.SQLiteOpenHelper;
  * Created by Patrick on 12/26/2017.
  */
 
-public class DBHelper extends SQLiteOpenHelper {
+public class SavedPsgsHelper extends SQLiteOpenHelper {
 
     //this should be changed to reflect the name of the app?
-    public static final String DB_FILE_NAME = "ScriptureMemory.db";
+    private static final String DB_FILE_NAME = "ScriptureMemory.db";
     //this should be changed if the DB is ever changed
-    public static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 1;
 
-    public DBHelper(Context context) {
+    public SavedPsgsHelper(Context context) {
         super(context, DB_FILE_NAME, null, DB_VERSION);
     }
 

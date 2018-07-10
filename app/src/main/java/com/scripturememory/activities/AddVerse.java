@@ -35,13 +35,13 @@ import com.scripturememory.helpers.JsonParser;
 import com.scripturememory.models.Language;
 import com.scripturememory.models.MemoryPassage;
 import com.scripturememory.R;
-import com.scripturememory.data.DataSource;
+import com.scripturememory.data.SavedPsgsDao;
 
 public class AddVerse extends AppCompatActivity {
 
     private static final String BIBLE_API_KEY = "05f145575386971d2f9a4fafb4b27983";
 
-    private DataSource mDataSource;
+    private SavedPsgsDao mSavedPsgsDao;
 
     private String selectedLngCode;
     private String selectedVersionCode;
@@ -71,8 +71,8 @@ public class AddVerse extends AppCompatActivity {
 //        }
 
         // This inserts a test verse every time the '+' fab is pressed
-        mDataSource = new DataSource(this);
-        mDataSource.open();
+        mSavedPsgsDao = new SavedPsgsDao(this);
+        mSavedPsgsDao.open();
 
         // Set selectors
         final AutoCompleteTextView languageSelector = (AutoCompleteTextView) findViewById(R.id.languageSelect);
@@ -165,7 +165,7 @@ public class AddVerse extends AppCompatActivity {
                 MemoryPassage passage = getPassage(damId, selectedBookId, selectedChapter, selectedVerse,selectedVerse);
 
                 if(passage != null) {
-                    mDataSource.insertPsg(passage);
+                    mSavedPsgsDao.insertPsg(passage);
                 }
             }
         });

@@ -15,16 +15,16 @@ import com.scripturememory.helpers.TransformData;
 
 /**
  * Created by Patrick on 12/26/2017.
+ * This Dao interacts holds the methods that interact with the database
  */
-
-public class DataSource {
+public class SavedPsgsDao {
     private Context mContext;
     private SQLiteDatabase mDatabase;
     private SQLiteOpenHelper mdbHelper;
 
-    public DataSource(Context context) {
+    public SavedPsgsDao(Context context) {
         this.mContext = context;
-        mdbHelper = new DBHelper(mContext);
+        mdbHelper = new SavedPsgsHelper(mContext);
     }
 
     public void open(){
@@ -42,11 +42,11 @@ public class DataSource {
         mDatabase.insert(SavedPsgsTable.TABLE_SAVEDPSGS, null, values);
     }
 
-    public long getSavedPsgCount () {
+    public long getSavedPsgCount() {
         return DatabaseUtils.queryNumEntries(mDatabase, SavedPsgsTable.TABLE_SAVEDPSGS);
     }
 
-    public List<MemoryPassage> getAllItems() {
+    public List<MemoryPassage> getAllPsgs() {
         List<MemoryPassage> lstSavedPsgs = new ArrayList<>();
 
         //Equivalent to Java resultset class

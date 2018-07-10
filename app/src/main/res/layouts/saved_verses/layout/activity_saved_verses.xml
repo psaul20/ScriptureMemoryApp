@@ -17,19 +17,17 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
-
     </android.support.design.widget.AppBarLayout>
-
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabAddVerse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:backgroundTint="@android:color/background_dark"
-        app:srcCompat="@android:drawable/ic_input_add" />
+        app:srcCompat="@drawable/ic_plus_sign" />
 
-    <include layout="@layout/content_saved_verses"
-        android:id="@+id/include" />
+    <include
+        android:id="@+id/include"
+        layout="@layout/content_saved_verses" />
 
 </android.support.design.widget.CoordinatorLayout>

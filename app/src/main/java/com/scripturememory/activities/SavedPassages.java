@@ -13,10 +13,11 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.scripturememory.data.SavedPsgsService;
 import com.scripturememory.models.MemoryPassage;
 import com.scripturememory.R;
 import com.scripturememory.adapters.SavedPsgAdapter;
-import com.scripturememory.data.DataSource;
+import com.scripturememory.data.SavedPsgsDao;
 
 public class SavedPassages extends AppCompatActivity {
 
@@ -24,7 +25,7 @@ public class SavedPassages extends AppCompatActivity {
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager llmVerseLayout;
     private List<MemoryPassage> lstSavedPsgs = new ArrayList<>();
-    private DataSource mDataSource;
+    private SavedPsgsService mSavedPsgsService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +48,10 @@ public class SavedPassages extends AppCompatActivity {
         try {
 
             //Automatically calls onCreate method if the database hasn't been created
-            mDataSource = new DataSource(this);
-            mDataSource.open();
+            mSavedPsgsService = new SavedPsgsService(this);
+            mSavedPsgsService.openDb();
 
-            getSavedPsgs();
+            lstSavedPsgs = mSavedPsgsService.getAllPsgs();
 
             rcvSavedVerses = (RecyclerView) findViewById(R.id.rcvSavedVerses);
 
@@ -74,36 +75,20 @@ public class SavedPassages extends AppCompatActivity {
 
     }
 
-    protected void getSavedPsgs (){
-        try {
-            long numItems = mDataSource.getSavedPsgCount();
-            if (numItems > 0 ){
-                lstSavedPsgs = mDataSource.getAllItems();
-            }
-            else {
-                //Display View to entice user to add verses
-                System.out.println("NO SAVED PASSAGES");
-            }
-        }
-        catch (Exception e){
-            //Exception Handling
-        }
-    }
-
     //This is a lifecycle method for when the orientation changes on the device
     //or anything else happens which interrupts the activity
     //closing prevents database leaks
     @Override
     protected void onPause(){
         super.onPause();
-        mDataSource.close();
+        mSavedPsgsService.closeDb();
     }
 
     //Lifecycle method for interrupts
     @Override
     protected void onResume(){
         super.onResume();
-        mDataSource.open();
+        mSavedPsgsService.openDb();
     }
 
 
