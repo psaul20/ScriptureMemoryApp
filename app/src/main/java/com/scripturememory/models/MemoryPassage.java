@@ -97,13 +97,10 @@ public class MemoryPassage implements Parcelable {
     public String getPsgReference () {
         String strPsgRef;
         if (intEndVerse == intStartVerse) {
-            strPsgRef = strBook + " " + Integer.toString(intChapter) + ":" + Integer.toString(intEndVerse);
+            strPsgRef = strBook + " " + intChapter + ":" + intEndVerse;
+        } else {
+            strPsgRef = strBook + " " + intChapter + ":" + intStartVerse + "-" + intEndVerse;
         }
-
-        else {
-            strPsgRef = strBook + " " + Integer.toString(intChapter) + ":" + Integer.toString(intStartVerse) + "-" + Integer.toString(intEndVerse);
-        }
-
         return strPsgRef;
     }
 

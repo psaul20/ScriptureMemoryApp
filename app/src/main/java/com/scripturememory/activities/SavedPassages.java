@@ -22,10 +22,8 @@ import com.scripturememory.data.SavedPsgsDao;
 public class SavedPassages extends AppCompatActivity {
 
     private RecyclerView rcvSavedVerses;
-    private RecyclerView.Adapter adapter;
-    private RecyclerView.LayoutManager llmVerseLayout;
     private List<MemoryPassage> lstSavedPsgs = new ArrayList<>();
-    private SavedPsgsService mSavedPsgsService;
+    private SavedPsgsService savedPsgsService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,33 +43,20 @@ public class SavedPassages extends AppCompatActivity {
             }
         });
 
-        try {
+        savedPsgsService = new SavedPsgsService(this);
+        savedPsgsService.openDb();
+        lstSavedPsgs = savedPsgsService.getAllPsgs();
+        rcvSavedVerses = (RecyclerView) findViewById(R.id.rcvSavedVerses);
 
-            //Automatically calls onCreate method if the database hasn't been created
-            mSavedPsgsService = new SavedPsgsService(this);
-            mSavedPsgsService.openDb();
+        //Used for performance gains if list item layout will not change based on addition of new items
+        rcvSavedVerses.setHasFixedSize(true);
 
-            lstSavedPsgs = mSavedPsgsService.getAllPsgs();
+        //Declare and specify layout manager for RecyclerView
+        rcvSavedVerses.setLayoutManager(new LinearLayoutManager(this));
 
-            rcvSavedVerses = (RecyclerView) findViewById(R.id.rcvSavedVerses);
-
-            //Used for performance gains if list item layout will not change based on addition of new items
-            rcvSavedVerses.setHasFixedSize(true);
-
-            //Declare and specify layout manager for RecyclerView
-            llmVerseLayout = new LinearLayoutManager(this);
-            rcvSavedVerses.setLayoutManager(llmVerseLayout);
-
-            //Declare and specify adapter for RecyclerView. See SavedVerseAdapter Class
-            adapter = new SavedPsgAdapter(this, lstSavedPsgs);
-            rcvSavedVerses.setAdapter(adapter);
-
-        }
-        catch (Exception e)
-        {
-            //Exception Handling
-            e.printStackTrace();
-        }
+        //Declare and specify adapter for RecyclerView. See SavedVerseAdapter Class
+        RecyclerView.Adapter adapter = new SavedPsgAdapter(this, lstSavedPsgs);
+        rcvSavedVerses.setAdapter(adapter);
 
     }
 
@@ -81,14 +66,14 @@ public class SavedPassages extends AppCompatActivity {
     @Override
     protected void onPause(){
         super.onPause();
-        mSavedPsgsService.closeDb();
+        savedPsgsService.closeDb();
     }
 
     //Lifecycle method for interrupts
     @Override
     protected void onResume(){
         super.onResume();
-        mSavedPsgsService.openDb();
+        savedPsgsService.openDb();
     }
 
 

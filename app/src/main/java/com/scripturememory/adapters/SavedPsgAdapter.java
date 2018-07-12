@@ -23,50 +23,35 @@ import com.scripturememory.activities.MemoryExercise;
 
 public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHolder> {
 
-    private List<MemoryPassage> lstSavedPsgs = new ArrayList<>();
+    private List<MemoryPassage> lstSavedPsgs;
     private Context mContext;
 
     //set generic constant to store psg on click with intent.putExtra
     public static final String PSG_KEY = "psg_key";
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public SavedPsgAdapter(Context context, List<MemoryPassage> DataSet) {
-        lstSavedPsgs = DataSet;
+    public SavedPsgAdapter(Context context, List<MemoryPassage> savedPsgs) {
         mContext = context;
+        lstSavedPsgs = savedPsgs;
     }
 
     // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView txtPsgRef;
-        //used for click event
-        public View mView;
+        private TextView passageTitle;
 
-        //ViewHolder constructor
-        public ViewHolder(View savedPsgView) {
-
+        private ViewHolder(View savedPsgView) {
             super(savedPsgView);
-
-            //give txtPsgRef attributes of TextView from inflated view model
-            txtPsgRef = (TextView) savedPsgView.findViewById(R.id.txtPsgRefText);
-
-            //make entire inflated view model into clickable view
-            mView = savedPsgView;
+            passageTitle = savedPsgView.findViewById(R.id.passageTitle);
         }
     }
 
     // Create new views (invoked by the layout manager)
     @Override
     public SavedPsgAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // create a new view by inflating from pre defined view model
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        View savedPsgView = inflater.inflate(R.layout.saved_verse_view_model, parent, false);
-        // option to set the view's size, margins, paddings and layout parameters
-        //...
+        View savedPsgView = inflater.inflate(R.layout.row_saved_verses, parent, false);
         return new ViewHolder(savedPsgView);
-
     }
 
     // Replace the contents of a view (invoked by the layout manager)
@@ -74,22 +59,14 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
         final MemoryPassage psg = lstSavedPsgs.get(position);
-        // - replace the contents of the view with given passage
-        try {
-            holder.txtPsgRef.setText(psg.getPsgReference());
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        holder.mView.setOnClickListener(new View.OnClickListener() {
+        holder.passageTitle.setText(psg.getPsgReference());
+        holder.passageTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
                 //Open new exercise activity, display text
                 Intent intent = new Intent(mContext, MemoryExercise.class);
                 intent.putExtra(PSG_KEY, psg);
                 mContext.startActivity(intent);
-
             }
         });
     }

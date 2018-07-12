@@ -162,7 +162,7 @@ public class AddVerse extends AppCompatActivity {
                 int selectedVerse = (Integer) parent.getItemAtPosition(position);
                 String selectedBookId = mapNameToBook.get(selectedBookName).getBookId();
                 String damId = mapNameToBook.get(selectedBookName).getDamId();
-                MemoryPassage passage = getPassage(damId, selectedBookId, selectedChapter, selectedVerse,selectedVerse);
+                MemoryPassage passage = getPassage(damId, selectedBookId, selectedBookName, selectedChapter, selectedVerse,selectedVerse);
 
                 if(passage != null) {
                     mSavedPsgsDao.insertPsg(passage);
@@ -242,7 +242,7 @@ public class AddVerse extends AppCompatActivity {
         return verses;
     }
 
-    public MemoryPassage getPassage(String damId, String bookId, int chapter, int startVerse, int endVerse) {
+    public MemoryPassage getPassage(String damId, String bookId, String bookName, int chapter, int startVerse, int endVerse) {
         // Try with damId 1
         String text = "";
         String query = "https://dbt.io/text/verse?key=" + BIBLE_API_KEY
@@ -255,7 +255,7 @@ public class AddVerse extends AppCompatActivity {
                 if(!text.isEmpty()) {
                     // Found verses. Create passage
                     return new MemoryPassage(damId.substring(0, damId.length()-1),
-                            bookId, chapter, startVerse, endVerse, text);
+                            bookName, chapter, startVerse, endVerse, text);
                 } else {
                     // // Could not find any verses. Try with damId 2
                     query = "https://dbt.io/text/verse?key=" + BIBLE_API_KEY
@@ -267,7 +267,7 @@ public class AddVerse extends AppCompatActivity {
                         if (!text.isEmpty()) {
                             // Found verses. Create passage
                             return new MemoryPassage(damId.substring(0, damId.length() - 1),
-                                    bookId, chapter, startVerse, endVerse, text);
+                                    bookName, chapter, startVerse, endVerse, text);
                         }
                     }
                 }
