@@ -33,8 +33,6 @@ import com.scripturememory.network.ScriptureClient;
 
 public class AddVerse extends AppCompatActivity {
 
-    private static final String BIBLE_API_KEY = "05f145575386971d2f9a4fafb4b27983";
-
     private Logger logger = Logger.getLogger(getClass().toString());
 
     private SavedPsgsService mSavedPsgsService;
@@ -132,7 +130,7 @@ public class AddVerse extends AppCompatActivity {
     }
 
     public void populateLanguages() {
-        String url = "https://dbt.io/library/volumelanguagefamily?key=" + BIBLE_API_KEY + "&media=text&v=2";
+        String url = "https://dbt.io/library/volumelanguagefamily?key=" + ScriptureClient.BIBLE_API_KEY + "&media=text&v=2";
         JsonArrayRequest languageRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -156,7 +154,7 @@ public class AddVerse extends AppCompatActivity {
     }
 
     public void populateBibleVersions(String lngCode) {
-        String url = "https://dbt.io/library/volume?key=" + BIBLE_API_KEY + "&media=text&language_family_code=" + lngCode + "&v=2";
+        String url = "https://dbt.io/library/volume?key=" + ScriptureClient.BIBLE_API_KEY + "&media=text&language_family_code=" + lngCode + "&v=2";
         JsonArrayRequest bibleVersionRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -180,7 +178,7 @@ public class AddVerse extends AppCompatActivity {
     }
 
     public void populateBooks(String lngCode, String versionCode) {
-        String url = "https://dbt.io/library/book?key=" + BIBLE_API_KEY + "&dam_id=" + lngCode + versionCode + "&v=2";
+        String url = "https://dbt.io/library/book?key=" + ScriptureClient.BIBLE_API_KEY + "&dam_id=" + lngCode + versionCode + "&v=2";
         JsonArrayRequest bookRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -205,7 +203,7 @@ public class AddVerse extends AppCompatActivity {
     }
 
     public void populateVerses(final String damId, final String bookId, final int chapter) {
-        String url = "https://dbt.io/library/verseinfo?key=" + BIBLE_API_KEY
+        String url = "https://dbt.io/library/verseinfo?key=" + ScriptureClient.BIBLE_API_KEY
                 + "&dam_id=" + damId + "1ET&book_id=" + bookId + "&chapter_id=" + chapter + "&v=2";
         StringRequest verseRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
@@ -218,7 +216,7 @@ public class AddVerse extends AppCompatActivity {
                     }
                     if (availableVerses.isEmpty()) {
                         // // Could not find any verses. Try with damId 2
-                        String url = "https://dbt.io/library/verseinfo?key=" + BIBLE_API_KEY
+                        String url = "https://dbt.io/library/verseinfo?key=" + ScriptureClient.BIBLE_API_KEY
                                 + "&dam_id=" + damId + "2ET&book_id=" + bookId + "&chapter_id=" + chapter + "&v=2";
                         StringRequest verseRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
                             @Override
@@ -259,7 +257,7 @@ public class AddVerse extends AppCompatActivity {
     }
 
     public void getPassage(final String damId, final String bookId, final String bookName, final int chapter, final int startVerse, final int endVerse) {
-        String url = "https://dbt.io/text/verse?key=" + BIBLE_API_KEY
+        String url = "https://dbt.io/text/verse?key=" + ScriptureClient.BIBLE_API_KEY
                 + "&dam_id=" + damId + "1ET&book_id=" + bookId + "&chapter_id="
                 + chapter + "&verse_start=" + startVerse + "&verse_end=" + endVerse + "&v=2";
         JsonArrayRequest passageRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
@@ -277,7 +275,7 @@ public class AddVerse extends AppCompatActivity {
                     }
                 } else {
                     // Could not find any verses. Try with damId 2
-                    String url = "https://dbt.io/text/verse?key=" + BIBLE_API_KEY
+                    String url = "https://dbt.io/text/verse?key=" + ScriptureClient.BIBLE_API_KEY
                             + "&dam_id=" + damId + "2ET&book_id=" + bookId + "&chapter_id="
                             + chapter + "&verse_start=" + startVerse + "&verse_end=" + endVerse + "&v=2";
                     JsonArrayRequest passageRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {

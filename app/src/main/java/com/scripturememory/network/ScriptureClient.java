@@ -8,6 +8,7 @@ import com.android.volley.toolbox.Volley;
 
 public class ScriptureClient {
 
+    public static final String BIBLE_API_KEY = "05f145575386971d2f9a4fafb4b27983";
     private static ScriptureClient mInstance;
     private RequestQueue mRequestQueue;
     private static Context mCtx;
