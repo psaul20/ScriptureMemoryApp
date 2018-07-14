@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.scripturememory.models.MemoryPassage;
 import com.scripturememory.helpers.TransformData;
@@ -22,6 +23,8 @@ public class SavedPsgsDao {
     private SQLiteDatabase mDatabase;
     private SQLiteOpenHelper mdbHelper;
 
+    private Logger logger = Logger.getLogger(getClass().toString());
+
     public SavedPsgsDao(Context context) {
         this.mContext = context;
         mdbHelper = new SavedPsgsHelper(mContext);
@@ -29,12 +32,12 @@ public class SavedPsgsDao {
 
     public void open(){
         mDatabase = mdbHelper.getWritableDatabase();
-        System.out.println("DB OPENED");
+        logger.info("DB OPENED");
     }
 
     public void close(){
         mdbHelper.close();
-        System.out.println("DB CLOSED");
+        logger.info("DB CLOSED");
     }
 
     public void insertPsg(MemoryPassage psg){

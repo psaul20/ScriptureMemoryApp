@@ -133,7 +133,7 @@ public class MemoryPassage implements Parcelable {
         dest.writeString(this.strText);
     }
 
-    protected MemoryPassage(Parcel in) {
+    private MemoryPassage(Parcel in) {
         this.strPsgID = in.readString();
         this.strTranslation = in.readString();
         this.strBook = in.readString();

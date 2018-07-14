@@ -1,7 +1,6 @@
 package com.scripturememory.activities;
 
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -9,77 +8,65 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.security.KeyStore;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
-
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.scripturememory.data.SavedPsgsService;
 import com.scripturememory.models.BibleVersion;
 import com.scripturememory.models.Book;
 import com.scripturememory.helpers.JsonParser;
 import com.scripturememory.models.Language;
 import com.scripturememory.models.MemoryPassage;
 import com.scripturememory.R;
-import com.scripturememory.data.SavedPsgsDao;
+import com.scripturememory.network.ScriptureClient;
 
 public class AddVerse extends AppCompatActivity {
 
     private static final String BIBLE_API_KEY = "05f145575386971d2f9a4fafb4b27983";
 
-    private SavedPsgsDao mSavedPsgsDao;
+    private Logger logger = Logger.getLogger(getClass().toString());
 
+    private SavedPsgsService mSavedPsgsService;
+    private ScriptureClient mScriptureClient;
     private String selectedLngCode;
     private String selectedVersionCode;
     private String selectedBookName;
     private Integer selectedChapter;
+    private MemoryPassage foundPassage;
     private Map<String, Book> mapNameToBook;
+    private AutoCompleteTextView languageSelector;
+    private AutoCompleteTextView versionSelector;
+    private AutoCompleteTextView bookSelector;
+    private AutoCompleteTextView chapterSelector;
+    private AutoCompleteTextView verseSelector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_verse);
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
 
-        // Test API
-//        List<Language> testLanguages = getAvailableLanguages();
-//        for(Language lng : testLanguages) {
-//            System.out.println(lng.getLngCode() + "-" + lng.getLngName());
-//        }
-//        List<BibleVersion> testVersions = getAvailableBibleVersions("ENG");
-//        for(BibleVersion bibVersion : testVersions) {
-//            System.out.println(bibVersion.getLngCode() + ": " + bibVersion.getVersionCode() + "-" + bibVersion.getVersionName());
-//        }
-//        List<Book> testBooks = getAvailableBooks("ENG", "ESV");
-//        for(Book book : testBooks) {
-//            System.out.println(book.getDamId() + ": " + book.getBookName() + "(" + book.getBookId() + ") - " + book.getNumChapters());
-//        }
+        mSavedPsgsService = new SavedPsgsService(this);
+        mSavedPsgsService.openDb();
 
-        // This inserts a test verse every time the '+' fab is pressed
-        mSavedPsgsDao = new SavedPsgsDao(this);
-        mSavedPsgsDao.open();
+        mScriptureClient = ScriptureClient.getInstance(this);
 
         // Set selectors
-        final AutoCompleteTextView languageSelector = (AutoCompleteTextView) findViewById(R.id.languageSelect);
-        final AutoCompleteTextView versionSelector = (AutoCompleteTextView) findViewById(R.id.versionSelect);
-        final AutoCompleteTextView bookSelector = (AutoCompleteTextView) findViewById(R.id.bookSelect);
-        final AutoCompleteTextView chapterSelector = (AutoCompleteTextView) findViewById(R.id.chapterSelect);
-        final AutoCompleteTextView verseSelector = (AutoCompleteTextView) findViewById(R.id.verseSelect);
+        languageSelector = (AutoCompleteTextView) findViewById(R.id.languageSelect);
+        versionSelector = (AutoCompleteTextView) findViewById(R.id.versionSelect);
+        bookSelector = (AutoCompleteTextView) findViewById(R.id.bookSelect);
+        verseSelector = (AutoCompleteTextView) findViewById(R.id.verseSelect);
+        chapterSelector = (AutoCompleteTextView) findViewById(R.id.chapterSelect);
 
         languageSelector.setThreshold(1);
         versionSelector.setThreshold(1);
@@ -89,28 +76,13 @@ public class AddVerse extends AppCompatActivity {
 
         mapNameToBook = new HashMap<>();
 
-        // language adapter and pre-filled options
-        List<Language> availableLanguages = getAvailableLanguages();
-        List<String> languages = new ArrayList<>();
-        for (Language language : availableLanguages) {
-            languages.add(language.getLngName() + " - " + language.getLngCode());
-        }
-        ArrayAdapter languageAdapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1, languages);
-        languageSelector.setAdapter(languageAdapter);
-
-        // set bible version options when language is set
+        populateLanguages();
         languageSelector.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selectedLang = (String)parent.getItemAtPosition(position);
                 selectedLngCode = selectedLang.substring(selectedLang.indexOf('-')+1).trim();
-                List<BibleVersion> availableVersions = getAvailableBibleVersions(selectedLngCode);
-                List<String> versions = new ArrayList<>();
-                for (BibleVersion version : availableVersions) {
-                    versions.add(version.getVersionName() + " - " + version.getVersionCode());
-                }
-                ArrayAdapter versionAdapter = new ArrayAdapter(AddVerse.this ,android.R.layout.simple_list_item_1, versions);
-                versionSelector.setAdapter(versionAdapter);
+                populateBibleVersions(selectedLngCode);
             }
         });
 
@@ -119,13 +91,7 @@ public class AddVerse extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selectedVersion = (String)parent.getItemAtPosition(position);
                 selectedVersionCode = selectedVersion.substring(selectedVersion.indexOf('-')+1).trim();
-                List<Book> availableBooks = getAvailableBooks(selectedLngCode, selectedVersionCode);
-                mapNameToBook.clear();
-                for (Book book : availableBooks) {
-                    mapNameToBook.put(book.getBookName(), book);
-                }
-                ArrayAdapter bookAdapter = new ArrayAdapter(AddVerse.this ,android.R.layout.simple_list_item_1, mapNameToBook.keySet().toArray());
-                bookSelector.setAdapter(bookAdapter);
+                populateBooks(selectedLngCode, selectedVersionCode);
             }
         });
 
@@ -149,10 +115,7 @@ public class AddVerse extends AppCompatActivity {
                 selectedChapter = (Integer) parent.getItemAtPosition(position);
                 String selectedBookId = mapNameToBook.get(selectedBookName).getBookId();
                 String damId = mapNameToBook.get(selectedBookName).getDamId();
-                List<Integer> verses = getAvailableVerses(damId, selectedBookId, selectedChapter);
-
-                ArrayAdapter verseAdapter = new ArrayAdapter(AddVerse.this ,android.R.layout.simple_list_item_1, verses);
-                verseSelector.setAdapter(verseAdapter);
+                populateVerses(damId, selectedBookId, selectedChapter);
             }
         });
 
@@ -162,198 +125,192 @@ public class AddVerse extends AppCompatActivity {
                 int selectedVerse = (Integer) parent.getItemAtPosition(position);
                 String selectedBookId = mapNameToBook.get(selectedBookName).getBookId();
                 String damId = mapNameToBook.get(selectedBookName).getDamId();
-                MemoryPassage passage = getPassage(damId, selectedBookId, selectedBookName, selectedChapter, selectedVerse,selectedVerse);
-
-                if(passage != null) {
-                    mSavedPsgsDao.insertPsg(passage);
-                }
+                getPassage(damId, selectedBookId, selectedBookName, selectedChapter, selectedVerse,selectedVerse);
             }
         });
 
     }
 
-    public List<Language> getAvailableLanguages() {
-        List<Language> languages = new ArrayList<>();
-        String query = "https://dbt.io/library/volumelanguagefamily?key=" + BIBLE_API_KEY + "&media=text&v=2";
-        String response = makeRequest(query);
-        if(response != null) {
-            try {
-                languages = JsonParser.readLanguages(new JSONArray(response));
-            } catch (Exception e) {
-                e.printStackTrace();
+    public void populateLanguages() {
+        String url = "https://dbt.io/library/volumelanguagefamily?key=" + BIBLE_API_KEY + "&media=text&v=2";
+        JsonArrayRequest languageRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                logger.info(response.toString());
+                List<Language> availableLanguages;
+                availableLanguages = JsonParser.readLanguages(response);
+                List<String> languages = new ArrayList<>();
+                for (Language language : availableLanguages) {
+                    languages.add(language.getLngName() + " - " + language.getLngCode());
+                }
+                ArrayAdapter languageAdapter = new ArrayAdapter(AddVerse.this,android.R.layout.simple_list_item_1, languages);
+                languageSelector.setAdapter(languageAdapter);
             }
-        }
-        return languages;
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        mScriptureClient.addToRequestQueue(languageRequest);
     }
 
-    public List<BibleVersion> getAvailableBibleVersions(String lngCode) {
-        List<BibleVersion> bibleVersions = new ArrayList<>();
-        String query = "https://dbt.io/library/volume?key=" + BIBLE_API_KEY
-                + "&media=text&language_family_code=" + lngCode + "&v=2";
-        String response = makeRequest(query);
-        if(response != null) {
-            try {
-                bibleVersions = JsonParser.readBibleVersions(new JSONArray(response));
-            } catch (Exception e) {
-                e.printStackTrace();
+    public void populateBibleVersions(String lngCode) {
+        String url = "https://dbt.io/library/volume?key=" + BIBLE_API_KEY + "&media=text&language_family_code=" + lngCode + "&v=2";
+        JsonArrayRequest bibleVersionRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                logger.info(response.toString());
+                List<BibleVersion> availableBibleVersions;
+                availableBibleVersions = JsonParser.readBibleVersions(response);
+                List<String> bibleVersions = new ArrayList<>();
+                for (BibleVersion bibleVersion : availableBibleVersions) {
+                    bibleVersions.add(bibleVersion.getVersionName() + " - " + bibleVersion.getVersionCode());
+                }
+                ArrayAdapter versionAdapter = new ArrayAdapter(AddVerse.this ,android.R.layout.simple_list_item_1, bibleVersions);
+                versionSelector.setAdapter(versionAdapter);
             }
-        }
-        return bibleVersions;
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        mScriptureClient.addToRequestQueue(bibleVersionRequest);
     }
 
-    public List<Book> getAvailableBooks(String lngCode, String versionCode) {
-        List<Book> books = new ArrayList<>();
-        String query = "https://dbt.io/library/book?key=" + BIBLE_API_KEY
-                + "&dam_id=" + lngCode + versionCode + "&v=2";
-        String response = makeRequest(query);
-        if(response != null) {
-            try {
-                books = JsonParser.readBooks(new JSONArray(response));
-            } catch(Exception e) {
-                e.printStackTrace();
+    public void populateBooks(String lngCode, String versionCode) {
+        String url = "https://dbt.io/library/book?key=" + BIBLE_API_KEY + "&dam_id=" + lngCode + versionCode + "&v=2";
+        JsonArrayRequest bookRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                logger.info(response.toString());
+                List<Book> availableBooks;
+                availableBooks = JsonParser.readBooks(response);
+                List<String> books = new ArrayList<>();
+                mapNameToBook.clear();
+                for (Book book : availableBooks) {
+                    mapNameToBook.put(book.getBookName(), book);
+                }
+                ArrayAdapter bookAdapter = new ArrayAdapter(AddVerse.this ,android.R.layout.simple_list_item_1, mapNameToBook.keySet().toArray());
+                bookSelector.setAdapter(bookAdapter);
             }
-        }
-        return books;
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        mScriptureClient.addToRequestQueue(bookRequest);
     }
 
-    public List<Integer> getAvailableVerses(String damId, String bookId, int chapter) {
-        List<Integer> verses = new ArrayList<>();
-        String query = "https://dbt.io/library/verseinfo?key=" + BIBLE_API_KEY
+    public void populateVerses(final String damId, final String bookId, final int chapter) {
+        String url = "https://dbt.io/library/verseinfo?key=" + BIBLE_API_KEY
                 + "&dam_id=" + damId + "1ET&book_id=" + bookId + "&chapter_id=" + chapter + "&v=2";
-        String response = makeRequest(query);
-        if(response != null) {
-            try {
-                if (!response.startsWith("[")) {
-                    verses = JsonParser.readVerses(new JSONObject(response), bookId, chapter);
-                }
-                if (verses.isEmpty()) {
-                    // // Could not find any verses. Try with damId 2
-                    query = "https://dbt.io/library/verseinfo?key=" + BIBLE_API_KEY
-                            + "&dam_id=" + damId + "2ET&book_id=" + bookId + "&chapter_id=" + chapter + "&v=2";
-                    response = makeRequest(query);
-                    if (response != null && !response.startsWith("[")) {
-                        verses = JsonParser.readVerses(new JSONObject(response), bookId, chapter);
+        StringRequest verseRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    logger.info(response);
+                    List<Integer> availableVerses = new ArrayList<>();
+                    if (!response.startsWith("[")) {
+                        availableVerses = JsonParser.readVerses(new JSONObject(response), bookId, chapter);
                     }
+                    if (availableVerses.isEmpty()) {
+                        // // Could not find any verses. Try with damId 2
+                        String url = "https://dbt.io/library/verseinfo?key=" + BIBLE_API_KEY
+                                + "&dam_id=" + damId + "2ET&book_id=" + bookId + "&chapter_id=" + chapter + "&v=2";
+                        StringRequest verseRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                try {
+                                    logger.info(response);
+                                    List<Integer> availableVerses = new ArrayList<>();
+                                    if (!response.startsWith("[")) {
+                                        availableVerses = JsonParser.readVerses(new JSONObject(response), bookId, chapter);
+                                    }
+                                    ArrayAdapter verseAdapter = new ArrayAdapter(AddVerse.this, android.R.layout.simple_list_item_1, availableVerses);
+                                    verseSelector.setAdapter(verseAdapter);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                error.printStackTrace();
+                            }
+                        });
+                        mScriptureClient.addToRequestQueue(verseRequest);
+                    }
+                    ArrayAdapter verseAdapter = new ArrayAdapter(AddVerse.this ,android.R.layout.simple_list_item_1, availableVerses);
+                    verseSelector.setAdapter(verseAdapter);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
-        }
-        return verses;
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        mScriptureClient.addToRequestQueue(verseRequest);
     }
 
-    public MemoryPassage getPassage(String damId, String bookId, String bookName, int chapter, int startVerse, int endVerse) {
-        // Try with damId 1
-        String text = "";
-        String query = "https://dbt.io/text/verse?key=" + BIBLE_API_KEY
+    public void getPassage(final String damId, final String bookId, final String bookName, final int chapter, final int startVerse, final int endVerse) {
+        String url = "https://dbt.io/text/verse?key=" + BIBLE_API_KEY
                 + "&dam_id=" + damId + "1ET&book_id=" + bookId + "&chapter_id="
                 + chapter + "&verse_start=" + startVerse + "&verse_end=" + endVerse + "&v=2";
-        String response = makeRequest(query);
-        if(response != null) {
-            try {
-                text = JsonParser.readPassage(new JSONArray(response));
-                if(!text.isEmpty()) {
+        JsonArrayRequest passageRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                logger.info(response.toString());
+                String passageText = "";
+                passageText = JsonParser.readPassage(response);
+                if (!passageText.isEmpty()) {
                     // Found verses. Create passage
-                    return new MemoryPassage(damId.substring(0, damId.length()-1),
-                            bookName, chapter, startVerse, endVerse, text);
+                    foundPassage = new MemoryPassage(damId.substring(0, damId.length() - 1),
+                            bookName, chapter, startVerse, endVerse, passageText);
+                    if(foundPassage != null) {
+                        mSavedPsgsService.insertPsg(foundPassage);
+                    }
                 } else {
-                    // // Could not find any verses. Try with damId 2
-                    query = "https://dbt.io/text/verse?key=" + BIBLE_API_KEY
+                    // Could not find any verses. Try with damId 2
+                    String url = "https://dbt.io/text/verse?key=" + BIBLE_API_KEY
                             + "&dam_id=" + damId + "2ET&book_id=" + bookId + "&chapter_id="
                             + chapter + "&verse_start=" + startVerse + "&verse_end=" + endVerse + "&v=2";
-                    response = makeRequest(query);
-                    if(response != null) {
-                        text = JsonParser.readPassage(new JSONArray(response));
-                        if (!text.isEmpty()) {
-                            // Found verses. Create passage
-                            return new MemoryPassage(damId.substring(0, damId.length() - 1),
-                                    bookName, chapter, startVerse, endVerse, text);
+                    JsonArrayRequest passageRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                        @Override
+                        public void onResponse(JSONArray response) {
+                            logger.info(response.toString());
+                            String passageText = "";
+                            passageText = JsonParser.readPassage(response);
+                            if (!passageText.isEmpty()) {
+                                // Found verses. Create passage
+                                foundPassage = new MemoryPassage(damId.substring(0, damId.length() - 1),
+                                        bookName, chapter, startVerse, endVerse, passageText);
+                                if(foundPassage != null) {
+                                    mSavedPsgsService.insertPsg(foundPassage);
+                                }
+                            }
                         }
-                    }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            error.printStackTrace();
+                        }
+                    });
+                    mScriptureClient.addToRequestQueue(passageRequest);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
-        }
-        return null;
-    }
-
-    public String makeRequest(String query) {
-        HttpsURLConnection con = null;
-        boolean success = false;
-        StringBuilder response = new StringBuilder();
-
-        try {
-
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            // From https://www.washington.edu/itconnect/security/ca/load-der.crt
-            InputStream caInput = new BufferedInputStream(getAssets().open("bible.crt"));
-            Certificate ca;
-            try {
-                ca = cf.generateCertificate(caInput);
-                System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
-            } finally {
-                caInput.close();
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
             }
-
-            // Create a KeyStore containing our trusted CAs
-            String keyStoreType = KeyStore.getDefaultType();
-            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-            keyStore.load(null, null);
-            keyStore.setCertificateEntry("ca", ca);
-
-            // Create a TrustManager that trusts the CAs in our KeyStore
-            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-            tmf.init(keyStore);
-
-            // Create an SSLContext that uses our TrustManager
-            SSLContext context = SSLContext.getInstance("TLS");
-            context.init(null, tmf.getTrustManagers(), null);
-
-
-            // Set HttpsRequest Properties
-            URL url = new URL(query);
-            con = (HttpsURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
-            con.setRequestProperty("Content-Type", "application/json");
-            con.setSSLSocketFactory(context.getSocketFactory());
-
-            // Connect and check for successful response
-            con.connect();
-            int responseCode = con.getResponseCode();
-            InputStream inputStream;
-
-            if (200 <= responseCode && responseCode <= 299) {
-                inputStream = con.getInputStream();
-                success = true;
-            } else {
-                inputStream = con.getErrorStream();
-            }
-
-            // Collect response as String
-            BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
-
-            String currentLine;
-            while ((currentLine = in.readLine()) != null) {
-                response.append(currentLine);
-            }
-
-            in.close();
-
-            System.out.println("Response: " + response.toString());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            con.disconnect();
-        }
-
-        if(success) {
-            return response.toString();
-        } else {
-            return null;
-        }
+        });
+        mScriptureClient.addToRequestQueue(passageRequest);
     }
 
 }
