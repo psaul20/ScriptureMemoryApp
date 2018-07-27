@@ -52,8 +52,8 @@ public class MemoryPassage implements Parcelable {
         return strPsgID;
     }
 
-    public void setPsgID(String strPsgID) {
-        this.strPsgID = strPsgID;
+    public void setPsgID(String PsgID) {
+        this.strPsgID = PsgID;
     }
 
     public String getTranslation() {
@@ -100,48 +100,44 @@ public class MemoryPassage implements Parcelable {
         return strText;
     }
 
-    public void setText(String strText) {
-        this.strText = strText;
+    public void setText(String Text) {
+        this.strText = Text;
     }
 
-    public long getLngLastExerc() {
+    public long getLastExerc() {
         return lngLastExerc;
     }
 
-    public void setLngLastExerc(long lngLastExerc) {
-        this.lngLastExerc = lngLastExerc;
-    }
+    public void setLastExerc(long LastExerc) { this.lngLastExerc = LastExerc; }
 
-    public long getLngNextExerc() {
+    public long getNextExerc() {
         return lngNextExerc;
     }
 
-    public void setLngNextExerc(long lngNextExerc) {
-        this.lngNextExerc = lngNextExerc;
-    }
+    public void setNextExerc(long NextExerc) { this.lngNextExerc = NextExerc; }
 
-    public int getIntCurrentSeq() {
+    public int getCurrentSeq() {
         return intCurrentSeq;
     }
 
-    public void setIntCurrentSeq(int intCurrentSeq) {
-        this.intCurrentSeq = intCurrentSeq;
+    public void setCurrentSeq(int CurrentSeq) {
+        this.intCurrentSeq = CurrentSeq;
     }
 
-    public int getIntPrevSeq() {
+    public int getPrevSeq() {
         return intPrevSeq;
     }
 
-    public void setIntPrevSeq(int intPrevSeq) {
-        this.intPrevSeq = intPrevSeq;
+    public void setPrevSeq(int PrevSeq) {
+        this.intPrevSeq = PrevSeq;
     }
 
-    public String getStrExercMsg() {
+    public String getExercMsg() {
         return strExercMsg;
     }
 
-    public void setStrExercMsg(String strExercMsg) {
-        this.strExercMsg = strExercMsg;
+    public void setExercMsg(String ExercMsg) {
+        this.strExercMsg = ExercMsg;
     }
 
 
@@ -156,75 +152,86 @@ public class MemoryPassage implements Parcelable {
         return strPsgRef;
     }
 
-    public void setNextExerc (){
+    public void calcNextExerc (){
 
         //Indicates newly added verse
         if (intCurrentSeq == 0){
-            lngNextExerc = System.currentTimeMillis();
+            setNextExerc(System.currentTimeMillis());
         }
 
         else {
             //Find time past since last exercise
-            long lngTimeDiff = System.currentTimeMillis() - lngLastExerc;
+            long lngTimeDiff = System.currentTimeMillis() - getLastExerc();
             //Convert intCurrentSeq from hours into Millis, subtract to find diff between time past since last
             //exercise and next exercise time
-            lngNextExerc = intCurrentSeq * 3600000L - lngTimeDiff;
+            setNextExerc((getCurrentSeq() * 3600000L) - lngTimeDiff);
         }
     }
 
-    public void setExercMsg(){
-        //Ready to Exercise within 10 minute window
-        if (lngNextExerc <= System.currentTimeMillis() + 600000L && lngNextExerc >= System.currentTimeMillis()) {
-            strExercMsg = "Ready to Exercise!";
+    public void buildExercMsg(){
+
+        long lngUpdatedNextExerc = getNextExerc();
+        long lngExercWindow = getPrevSeq() * 3600000L;
+
+        //Ready to Exercise window = previous sequence time interval
+        if (lngUpdatedNextExerc <= System.currentTimeMillis() + lngExercWindow && lngUpdatedNextExerc >= System.currentTimeMillis()) {
+            setExercMsg("Ready to Exercise!");
         }
 
         //Not ready to exercise yet
-        else if (lngNextExerc > System.currentTimeMillis() + 600000L){
-            strExercMsg = "Next Exercise in " + calcDueDate(lngNextExerc);
+        else if (lngUpdatedNextExerc > System.currentTimeMillis() + lngExercWindow){
+            setExercMsg("Next Exercise in " + calcDueDate(lngUpdatedNextExerc));
         }
 
         //Past due on exercise
-        else if (lngNextExerc < System.currentTimeMillis() ){
-            strExercMsg = "Next Exercise in " + calcDueDate(lngNextExerc);
+        else {
+            setExercMsg("Ready To Exercise! " + calcDueDate(lngUpdatedNextExerc) + " overdue");
         }
     }
 
-    private String calcDueDate (long lngMillis){
+    private String calcDueDate (long lngDueDateMillis){
         String strReturn = "";
+        long lngYearMillis = 31540000000L;
+        long lngMonthMillis = 2628000000L;
+        long lngWeekMillis = 604800000L;
+        long lngDayMillis = 86400000L;
+        long lngHourMillis = 3600000L;
+        long lngMinuteMillis = 60000L;
+        long lngSecondMillis = 1000L;
 
         //Years
-        if (lngMillis / 31540000000L > 0 || lngMillis / 31540000000L < 0){
-            strReturn = Long.toString(abs(lngMillis / 31540000000L)) + " years";
+        if (lngDueDateMillis / lngYearMillis > 0 || lngDueDateMillis / lngYearMillis < 0){
+            strReturn = Long.toString(abs(lngDueDateMillis / lngYearMillis)) + " years";
         }
 
         //Months
-        else if (lngMillis / 2628000000L > 0 || lngMillis / 2628000000L < 0){
-            strReturn = Long.toString(abs(lngMillis / 2628000000L)) + " months";
+        else if (lngDueDateMillis / lngMonthMillis > 0 || lngDueDateMillis / lngMonthMillis < 0){
+            strReturn = Long.toString(abs(lngDueDateMillis / lngMonthMillis)) + " months";
         }
 
         //Weeks
-        else if (lngMillis / 604800000L > 0 || lngMillis / 604800000L < 0){
-            strReturn = Long.toString(abs(lngMillis / 604800000L)) + " weeks";
+        else if (lngDueDateMillis / lngWeekMillis > 0 || lngDueDateMillis / lngWeekMillis < 0){
+            strReturn = Long.toString(abs(lngDueDateMillis / lngWeekMillis)) + " weeks";
         }
 
         //Days
-        else if (lngMillis / 86400000L > 0 || lngMillis / 86400000L < 0){
-            strReturn = Long.toString(abs(lngMillis / 86400000L)) + " days";
+        else if (lngDueDateMillis / lngDayMillis > 0 || lngDueDateMillis / lngDayMillis < 0){
+            strReturn = Long.toString(abs(lngDueDateMillis / lngDayMillis)) + " days";
         }
 
         //Hours
-        else if (lngMillis / 3600000L > 0 || lngMillis / 3600000L < 0){
-            strReturn = Long.toString(abs(lngMillis / 3600000L)) + " hours";
+        else if (lngDueDateMillis / lngHourMillis > 0 || lngDueDateMillis / lngHourMillis < 0){
+            strReturn = Long.toString(abs(lngDueDateMillis / lngHourMillis)) + " hours";
         }
 
         //Minutes
-        else if (lngMillis / 60000L > 0 || lngMillis / 60000L < 0){
-            strReturn = Long.toString(abs(lngMillis / 60000L)) + " minutes";
+        else if (lngDueDateMillis / lngMinuteMillis > 0 || lngDueDateMillis / lngMinuteMillis < 0){
+            strReturn = Long.toString(abs(lngDueDateMillis / lngMinuteMillis)) + " minutes";
         }
 
         //Seconds
-        else if (lngMillis / 1000L > 0 || lngMillis / 1000L < 0){
-            strReturn = Long.toString(abs(lngMillis / 1000L)) + " seconds";
+        else if (lngDueDateMillis / lngSecondMillis > 0 || lngDueDateMillis / lngSecondMillis < 0){
+            strReturn = Long.toString(abs(lngDueDateMillis / lngSecondMillis)) + " seconds";
         }
 
         return strReturn;

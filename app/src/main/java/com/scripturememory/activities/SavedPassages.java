@@ -56,14 +56,14 @@ public class SavedPassages extends AppCompatActivity {
         rcvSavedVerses.setLayoutManager(new LinearLayoutManager(this));
 
             for (MemoryPassage psg:lstSavedPsgs) {
-                psg.setNextExerc();
-                psg.setExercMsg();
+                psg.calcNextExerc();
+                psg.buildExercMsg();
             }
 
             //Sort items coming due sooner first
             Collections.sort(lstSavedPsgs, new Comparator<MemoryPassage>() {
                 public int compare(MemoryPassage one, MemoryPassage other){
-                    return Long.compare(one.getLngNextExerc(), other.getLngNextExerc());
+                    return Long.compare(one.getNextExerc(), other.getNextExerc());
                 }
             });
 

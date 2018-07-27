@@ -76,7 +76,7 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
         final MemoryPassage psg = lstSavedPsgs.get(position);
         // - replace the contents of the view with given passage
             holder.txtPsgRef.setText(psg.getPsgReference());
-            holder.txtExercMsg.setText(psg.getStrExercMsg());
+            holder.txtExercMsg.setText(psg.getExercMsg());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
 
