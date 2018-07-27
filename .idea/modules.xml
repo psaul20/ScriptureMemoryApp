@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ScriptureMemory.iml" filepath="$PROJECT_DIR$/ScriptureMemory.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ScriptureMemoryApp.iml" filepath="$PROJECT_DIR$/ScriptureMemoryApp.iml" />
       <module fileurl="file://C:\Users\Patrick\Documents\GitHub\ScriptureMemory\ScriptureMemoryApp.iml" filepath="C:\Users\Patrick\Documents\GitHub\ScriptureMemory\ScriptureMemoryApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>

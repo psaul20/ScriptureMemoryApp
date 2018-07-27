@@ -2,11 +2,14 @@ package a535apps.scripturememory;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,19 +39,24 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
     // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
+        private ConstraintLayout clLayout;
+        private ConstraintLayout.LayoutParams lpLayout;
         private TextView txtPsgRef;
+        private TextView txtExercMsg;
         //used for click event
-        public View mView;
+        private View mView;
 
         //ViewHolder constructor
-        public ViewHolder(View savedPsgView) {
+        private ViewHolder(View savedPsgView) {
 
             super(savedPsgView);
 
-            //give txtPsgRef attributes of TextView from inflated view model
-            txtPsgRef = (TextView) savedPsgView.findViewById(R.id.txtPsgRefText);
+            //Link java to views inflated from view model XML
+            clLayout = (ConstraintLayout) savedPsgView.findViewById(R.id.clLayout);
+            txtPsgRef = (TextView) savedPsgView.findViewById(R.id.txtPsgRef);
+            txtExercMsg = (TextView) savedPsgView.findViewById(R.id.txtExercMsg);
 
-            //make entire inflated view model into clickable view
+            //Sets clickbox to entire inflated view
             mView = savedPsgView;
         }
     }
@@ -58,7 +66,7 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
     public SavedPsgAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view by inflating from pre defined view model
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        View savedPsgView = inflater.inflate(R.layout.saved_verse_view_model, parent, false);
+        View savedPsgView = inflater.inflate(R.layout.saved_psg_view_model, parent, false);
         // option to set the view's size, margins, paddings and layout parameters
         //...
         return new ViewHolder(savedPsgView);
@@ -73,6 +81,7 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
         // - replace the contents of the view with given passage
         try {
             holder.txtPsgRef.setText(psg.getPsgReference());
+            holder.txtExercMsg.setText(psg.getStrExercMsg());
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -81,7 +90,7 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                //Open new exercise activity, display text
+                //Open new exercise activity, pass text along with intent
                 Intent intent = new Intent(mContext, MemoryExercise.class);
                 intent.putExtra(PSG_KEY, psg);
                 mContext.startActivity(intent);

@@ -11,6 +11,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import a535apps.scripturememory.database.DataSource;
@@ -26,7 +28,7 @@ public class SavedPassages extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_saved_verses);
+        setContentView(R.layout.activity_saved_psgs);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -49,6 +51,19 @@ public class SavedPassages extends AppCompatActivity {
 
             getSavedPsgs();
 
+            for (MemoryPassage psg:lstSavedPsgs) {
+                psg.setNextExerc();
+                psg.setExercMsg();
+            }
+
+            //Sort items coming due sooner first
+            Collections.sort(lstSavedPsgs, new Comparator<MemoryPassage>() {
+                public int compare(MemoryPassage one, MemoryPassage other){
+                    return Long.compare(one.getLngNextExerc(), other.getLngNextExerc());
+                }
+            });
+
+            //Create RecyclerView to be populated
             rcvSavedVerses = (RecyclerView) findViewById(R.id.rcvSavedVerses);
 
             //Used for performance gains if list item layout will not change based on addition of new items
@@ -58,7 +73,7 @@ public class SavedPassages extends AppCompatActivity {
             llmVerseLayout = new LinearLayoutManager(this);
             rcvSavedVerses.setLayoutManager(llmVerseLayout);
 
-            //Declare and specify adapter for RecyclerView. See SavedVerseAdapter Class
+            //Declare and specify adapter for RecyclerView. See SavedPsgAdapter Class
             adapter = new SavedPsgAdapter(this, lstSavedPsgs);
             rcvSavedVerses.setAdapter(adapter);
 
