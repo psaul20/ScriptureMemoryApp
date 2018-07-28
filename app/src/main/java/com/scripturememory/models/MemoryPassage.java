@@ -35,6 +35,7 @@ public class MemoryPassage implements Parcelable {
     }
 
     //Update this constructor for database
+    //Newly added passage Constructor
     public MemoryPassage(String translation, String book, int chapter, int startVerse, int endVerse, String text) {
         if(strPsgID == null) {
             strPsgID = UUID.randomUUID().toString();
@@ -45,6 +46,11 @@ public class MemoryPassage implements Parcelable {
         this.intStartVerse = startVerse;
         this.intEndVerse = endVerse;
         this.strText = text;
+        this.lngLastExerc = -1L;
+        this.lngNextExerc = -1L;
+        this.intCurrentSeq = 0;
+        this.intPrevSeq = 0;
+        this.strExercMsg = null;
     }
 
     //Getters and Setters
@@ -156,7 +162,8 @@ public class MemoryPassage implements Parcelable {
 
         //Indicates newly added verse
         if (intCurrentSeq == 0){
-            setNextExerc(System.currentTimeMillis());
+            //100000L buffer added to account for discrepancies caused by processing time (not sure if this is necessary)
+            setNextExerc(System.currentTimeMillis() + 100000L);
         }
 
         else {

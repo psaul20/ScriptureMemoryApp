@@ -82,7 +82,9 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
 
             @Override
             public void onClick(View v){
-                //Open new exercise activity, pass text along with intent
+                //Open new exercise activity, pass psg along with intent
+                //May need to calculate currentTimeMillis and pass along to standardize
+                //calculations (not sure if this is necessary)
                 Intent intent = new Intent(mContext, MemoryExercise.class);
                 intent.putExtra(PSG_KEY, psg);
                 mContext.startActivity(intent);
