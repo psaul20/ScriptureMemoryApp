@@ -2,6 +2,7 @@ package com.scripturememory.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +45,14 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
             super(savedPsgView);
             passageTitle = savedPsgView.findViewById(R.id.passageTitle);
         }
+
+        public TextView getPassageTitle() {
+            return passageTitle;
+        }
+
+        public void setPassageTitle(String title) {
+            passageTitle.setText(title);
+        }
     }
 
     // Create new views (invoked by the layout manager)
@@ -59,8 +68,8 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
         final MemoryPassage psg = lstSavedPsgs.get(position);
-        holder.passageTitle.setText(psg.getPsgReference());
-        holder.passageTitle.setOnClickListener(new View.OnClickListener() {
+        holder.setPassageTitle(psg.getPsgReference());
+        holder.getPassageTitle().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
                 //Open new exercise activity, display text

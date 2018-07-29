@@ -2,10 +2,8 @@ package com.scripturememory.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,7 +20,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.scripturememory.adapters.AddVerseAdapter;
+import com.scripturememory.adapters.AddVerseAdapter.OnChildClickListener;
 import com.scripturememory.data.SavedPsgsService;
+import com.scripturememory.models.AddVerseExpandableGroup;
+import com.scripturememory.models.AddVerseExpandableItem;
 import com.scripturememory.models.BibleVersion;
 import com.scripturememory.models.Book;
 import com.scripturememory.helpers.JsonParser;
@@ -31,7 +33,7 @@ import com.scripturememory.models.MemoryPassage;
 import com.scripturememory.R;
 import com.scripturememory.network.ScriptureClient;
 
-public class AddVerse extends AppCompatActivity {
+public class AddVerse extends AppCompatActivity implements OnChildClickListener {
 
     private Logger logger = Logger.getLogger(getClass().toString());
 
@@ -43,11 +45,9 @@ public class AddVerse extends AppCompatActivity {
     private Integer selectedChapter;
     private MemoryPassage foundPassage;
     private Map<String, Book> mapNameToBook;
-    private AutoCompleteTextView languageSelector;
-    private AutoCompleteTextView versionSelector;
-    private AutoCompleteTextView bookSelector;
-    private AutoCompleteTextView chapterSelector;
-    private AutoCompleteTextView verseSelector;
+    private RecyclerView recyclerView;
+    private AddVerseAdapter addVerseAdapter;
+    private List<AddVerseExpandableGroup> groupList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,74 +59,18 @@ public class AddVerse extends AppCompatActivity {
 
         mScriptureClient = ScriptureClient.getInstance(this);
 
-        // Set selectors
-        languageSelector = (AutoCompleteTextView) findViewById(R.id.languageSelect);
-        versionSelector = (AutoCompleteTextView) findViewById(R.id.versionSelect);
-        bookSelector = (AutoCompleteTextView) findViewById(R.id.bookSelect);
-        verseSelector = (AutoCompleteTextView) findViewById(R.id.verseSelect);
-        chapterSelector = (AutoCompleteTextView) findViewById(R.id.chapterSelect);
-
-        languageSelector.setThreshold(1);
-        versionSelector.setThreshold(1);
-        bookSelector.setThreshold(1);
-        chapterSelector.setThreshold(1);
-        verseSelector.setThreshold(1);
+        recyclerView = findViewById(R.id.rcvAddVerse);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        groupList.add(new AddVerseExpandableGroup("Language", new ArrayList<AddVerseExpandableItem>()));
+        groupList.add(new AddVerseExpandableGroup("Bible Version", new ArrayList<AddVerseExpandableItem>()));
+        groupList.add(new AddVerseExpandableGroup("Book", new ArrayList<AddVerseExpandableItem>()));
+        groupList.add(new AddVerseExpandableGroup("Chapter", new ArrayList<AddVerseExpandableItem>()));
+        groupList.add(new AddVerseExpandableGroup("Verse", new ArrayList<AddVerseExpandableItem>()));
+        addVerseAdapter = new AddVerseAdapter(groupList, AddVerse.this);
+        recyclerView.setAdapter(addVerseAdapter);
+        populateLanguages();
 
         mapNameToBook = new HashMap<>();
-
-        populateLanguages();
-        languageSelector.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String selectedLang = (String)parent.getItemAtPosition(position);
-                selectedLngCode = selectedLang.substring(selectedLang.indexOf('-')+1).trim();
-                populateBibleVersions(selectedLngCode);
-            }
-        });
-
-        versionSelector.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String selectedVersion = (String)parent.getItemAtPosition(position);
-                selectedVersionCode = selectedVersion.substring(selectedVersion.indexOf('-')+1).trim();
-                populateBooks(selectedLngCode, selectedVersionCode);
-            }
-        });
-
-        bookSelector.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectedBookName = (String)parent.getItemAtPosition(position);
-                int numChaptersAvailable = mapNameToBook.get(selectedBookName).getNumChapters();
-                List<Integer> chapters = new ArrayList<>();
-                for (int i = 1; i <= numChaptersAvailable; ++i) {
-                    chapters.add(i);
-                }
-                ArrayAdapter chapterAdapter = new ArrayAdapter(AddVerse.this ,android.R.layout.simple_list_item_1, chapters);
-                chapterSelector.setAdapter(chapterAdapter);
-            }
-        });
-
-        chapterSelector.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectedChapter = (Integer) parent.getItemAtPosition(position);
-                String selectedBookId = mapNameToBook.get(selectedBookName).getBookId();
-                String damId = mapNameToBook.get(selectedBookName).getDamId();
-                populateVerses(damId, selectedBookId, selectedChapter);
-            }
-        });
-
-        verseSelector.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                int selectedVerse = (Integer) parent.getItemAtPosition(position);
-                String selectedBookId = mapNameToBook.get(selectedBookName).getBookId();
-                String damId = mapNameToBook.get(selectedBookName).getDamId();
-                getPassage(damId, selectedBookId, selectedBookName, selectedChapter, selectedVerse,selectedVerse);
-            }
-        });
-
     }
 
     public void populateLanguages() {
@@ -134,15 +78,19 @@ public class AddVerse extends AppCompatActivity {
         JsonArrayRequest languageRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
+                System.out.println("HELLO!");
                 logger.info(response.toString());
                 List<Language> availableLanguages;
+                List<AddVerseExpandableItem> languageExpandableItems = new ArrayList<>();
                 availableLanguages = JsonParser.readLanguages(response);
                 List<String> languages = new ArrayList<>();
                 for (Language language : availableLanguages) {
-                    languages.add(language.getLngName() + " - " + language.getLngCode());
+                    String languageTitle = language.getLngName() + " - " + language.getLngCode();
+                    languageExpandableItems.add(new AddVerseExpandableItem(languageTitle));
                 }
-                ArrayAdapter languageAdapter = new ArrayAdapter(AddVerse.this,android.R.layout.simple_list_item_1, languages);
-                languageSelector.setAdapter(languageAdapter);
+                groupList.set(0, new AddVerseExpandableGroup("Language", languageExpandableItems));
+                addVerseAdapter = new AddVerseAdapter(groupList, AddVerse.this);
+                recyclerView.setAdapter(addVerseAdapter);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -160,13 +108,16 @@ public class AddVerse extends AppCompatActivity {
             public void onResponse(JSONArray response) {
                 logger.info(response.toString());
                 List<BibleVersion> availableBibleVersions;
+                List<AddVerseExpandableItem> versionsExpandableItems = new ArrayList<>();
                 availableBibleVersions = JsonParser.readBibleVersions(response);
                 List<String> bibleVersions = new ArrayList<>();
                 for (BibleVersion bibleVersion : availableBibleVersions) {
-                    bibleVersions.add(bibleVersion.getVersionName() + " - " + bibleVersion.getVersionCode());
+                    String bibleVersionTitle = bibleVersion.getVersionName() + " - " + bibleVersion.getVersionCode();
+                    versionsExpandableItems.add(new AddVerseExpandableItem(bibleVersionTitle));
                 }
-                ArrayAdapter versionAdapter = new ArrayAdapter(AddVerse.this ,android.R.layout.simple_list_item_1, bibleVersions);
-                versionSelector.setAdapter(versionAdapter);
+                groupList.set(1, new AddVerseExpandableGroup("Bible Version", versionsExpandableItems));
+                addVerseAdapter = new AddVerseAdapter(groupList, AddVerse.this);
+                recyclerView.setAdapter(addVerseAdapter);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -184,14 +135,17 @@ public class AddVerse extends AppCompatActivity {
             public void onResponse(JSONArray response) {
                 logger.info(response.toString());
                 List<Book> availableBooks;
+                List<AddVerseExpandableItem> booksExpandableItems = new ArrayList<>();
                 availableBooks = JsonParser.readBooks(response);
                 List<String> books = new ArrayList<>();
                 mapNameToBook.clear();
                 for (Book book : availableBooks) {
                     mapNameToBook.put(book.getBookName(), book);
+                    booksExpandableItems.add(new AddVerseExpandableItem(book.getBookName()));
                 }
-                ArrayAdapter bookAdapter = new ArrayAdapter(AddVerse.this ,android.R.layout.simple_list_item_1, mapNameToBook.keySet().toArray());
-                bookSelector.setAdapter(bookAdapter);
+                groupList.set(2, new AddVerseExpandableGroup("Book", booksExpandableItems));
+                addVerseAdapter = new AddVerseAdapter(groupList, AddVerse.this);
+                recyclerView.setAdapter(addVerseAdapter);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -211,6 +165,7 @@ public class AddVerse extends AppCompatActivity {
                 try {
                     logger.info(response);
                     List<Integer> availableVerses = new ArrayList<>();
+                    List<AddVerseExpandableItem> versesExpandableItems = new ArrayList<>();
                     if (!response.startsWith("[")) {
                         availableVerses = JsonParser.readVerses(new JSONObject(response), bookId, chapter);
                     }
@@ -224,11 +179,16 @@ public class AddVerse extends AppCompatActivity {
                                 try {
                                     logger.info(response);
                                     List<Integer> availableVerses = new ArrayList<>();
+                                    List<AddVerseExpandableItem> versesExpandableItems = new ArrayList<>();
                                     if (!response.startsWith("[")) {
                                         availableVerses = JsonParser.readVerses(new JSONObject(response), bookId, chapter);
                                     }
-                                    ArrayAdapter verseAdapter = new ArrayAdapter(AddVerse.this, android.R.layout.simple_list_item_1, availableVerses);
-                                    verseSelector.setAdapter(verseAdapter);
+                                    for (int verseNumber : availableVerses) {
+                                        versesExpandableItems.add(new AddVerseExpandableItem(Integer.toString(verseNumber)));
+                                    }
+                                    groupList.set(4, new AddVerseExpandableGroup("Verse", versesExpandableItems));
+                                    addVerseAdapter = new AddVerseAdapter(groupList, AddVerse.this);
+                                    recyclerView.setAdapter(addVerseAdapter);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -241,8 +201,12 @@ public class AddVerse extends AppCompatActivity {
                         });
                         mScriptureClient.addToRequestQueue(verseRequest);
                     }
-                    ArrayAdapter verseAdapter = new ArrayAdapter(AddVerse.this ,android.R.layout.simple_list_item_1, availableVerses);
-                    verseSelector.setAdapter(verseAdapter);
+                    for (int verseNumber : availableVerses) {
+                        versesExpandableItems.add(new AddVerseExpandableItem(Integer.toString(verseNumber)));
+                    }
+                    groupList.set(4, new AddVerseExpandableGroup("Verse", versesExpandableItems));
+                    addVerseAdapter = new AddVerseAdapter(groupList, AddVerse.this);
+                    recyclerView.setAdapter(addVerseAdapter);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -311,4 +275,36 @@ public class AddVerse extends AppCompatActivity {
         mScriptureClient.addToRequestQueue(passageRequest);
     }
 
+    @Override
+    public void onItemClick(AddVerseExpandableGroup group) {
+        if ((group).getTitle().equals("Language")) {
+            String selectedLng = group.getSelection();
+            selectedLngCode = selectedLng.substring(selectedLng.indexOf('-')+1).trim();
+            populateBibleVersions(selectedLngCode);
+        } else if (group.getTitle().equals("Bible Version")) {
+            String selectedVersion = group.getSelection();
+            selectedVersionCode = selectedVersion.substring(selectedVersion.indexOf('-')+1).trim();
+            populateBooks(selectedLngCode, selectedVersionCode);
+        } else if (group.getTitle().equals("Book")) {
+            selectedBookName = group.getSelection();
+            int numChaptersAvailable = mapNameToBook.get(selectedBookName).getNumChapters();
+            List<AddVerseExpandableItem> chaptersExpandableItems = new ArrayList<>();
+            for (int i = 1; i <= numChaptersAvailable; ++i) {
+                chaptersExpandableItems.add(new AddVerseExpandableItem(Integer.toString(i)));
+            }
+            groupList.set(3, new AddVerseExpandableGroup("Chapter", chaptersExpandableItems));
+            addVerseAdapter = new AddVerseAdapter(groupList, AddVerse.this);
+            recyclerView.setAdapter(addVerseAdapter);
+        } else if (group.getTitle().equals("Chapter")) {
+            selectedChapter = Integer.parseInt(group.getSelection());
+            String selectedBookId = mapNameToBook.get(selectedBookName).getBookId();
+            String damId = mapNameToBook.get(selectedBookName).getDamId();
+            populateVerses(damId, selectedBookId, selectedChapter);
+        } else if (group.getTitle().equals("Verse")) {
+            int selectedVerse = Integer.parseInt(group.getSelection());
+            String selectedBookId = mapNameToBook.get(selectedBookName).getBookId();
+            String damId = mapNameToBook.get(selectedBookName).getDamId();
+            getPassage(damId, selectedBookId, selectedBookName, selectedChapter, selectedVerse,selectedVerse);
+        }
+    }
 }
