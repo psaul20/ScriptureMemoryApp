@@ -11,13 +11,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import com.scripturememory.data.SavedPsgsService;
 import com.scripturememory.models.MemoryPassage;
 import com.scripturememory.R;
 import com.scripturememory.adapters.SavedPsgAdapter;
-import com.scripturememory.data.SavedPsgsDao;
 
 public class SavedPassages extends AppCompatActivity {
 
@@ -28,16 +29,16 @@ public class SavedPassages extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_saved_verses);
+        setContentView(R.layout.activity_saved_psgs);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fabAddPsg = (FloatingActionButton) findViewById(R.id.fabAddVerse);
         fabAddPsg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(SavedPassages.this, AddVerse.class));
+                startActivity(new Intent(SavedPassages.this, AddPsg.class));
                 Snackbar.make(view, "Passage Saved", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -46,7 +47,7 @@ public class SavedPassages extends AppCompatActivity {
         savedPsgsService = new SavedPsgsService(this);
         savedPsgsService.openDb();
         lstSavedPsgs = savedPsgsService.getAllPsgs();
-        rcvSavedVerses = (RecyclerView) findViewById(R.id.rcvSavedVerses);
+        rcvSavedVerses = findViewById(R.id.rcvSavedVerses);
 
         //Used for performance gains if list item layout will not change based on addition of new items
         rcvSavedVerses.setHasFixedSize(true);
@@ -54,11 +55,33 @@ public class SavedPassages extends AppCompatActivity {
         //Declare and specify layout manager for RecyclerView
         rcvSavedVerses.setLayoutManager(new LinearLayoutManager(this));
 
-        //Declare and specify adapter for RecyclerView. See SavedVerseAdapter Class
-        RecyclerView.Adapter adapter = new SavedPsgAdapter(this, lstSavedPsgs);
-        rcvSavedVerses.setAdapter(adapter);
+            for (MemoryPassage psg:lstSavedPsgs) {
+                psg.calcNextExerc();
+                psg.buildExercMsg();
+            }
 
-    }
+            //Sort items coming due sooner first
+            Collections.sort(lstSavedPsgs, new Comparator<MemoryPassage>() {
+                public int compare(MemoryPassage one, MemoryPassage other){
+                    return Long.compare(one.getNextExerc(), other.getNextExerc());
+                }
+            });
+
+            //Create RecyclerView to be populated
+            rcvSavedVerses = findViewById(R.id.rcvSavedVerses);
+
+            //Used for performance gains if list item layout will not change based on addition of new items
+            rcvSavedVerses.setHasFixedSize(true);
+
+            //Declare and specify layout manager for RecyclerView
+            rcvSavedVerses.setLayoutManager(new LinearLayoutManager(this));
+
+            //Declare and specify adapter for RecyclerView. See SavedPsgAdapter Class
+            RecyclerView.Adapter adapter = new SavedPsgAdapter(this, lstSavedPsgs);
+            rcvSavedVerses.setAdapter(adapter);
+
+        }
+
 
     //This is a lifecycle method for when the orientation changes on the device
     //or anything else happens which interrupts the activity

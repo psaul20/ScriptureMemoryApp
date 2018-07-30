@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,43 +38,31 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
         lstSavedPsgs = savedPsgs;
     }
 
-    // Provide a reference to the views for each data item
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-
-        private TextView passageTitle;
-
-        private ViewHolder(View savedPsgView) {
-            super(savedPsgView);
-            passageTitle = savedPsgView.findViewById(R.id.passageTitle);
-        }
-
-        public TextView getPassageTitle() {
-            return passageTitle;
-        }
-
-        public void setPassageTitle(String title) {
-            passageTitle.setText(title);
-        }
-    }
-
     // Create new views (invoked by the layout manager)
     @Override
     public SavedPsgAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        View savedPsgView = inflater.inflate(R.layout.row_saved_verses, parent, false);
+        View savedPsgView = inflater.inflate(R.layout.view_model_saved_psgs, parent, false);
+        // option to set the view's size, margins, paddings and layout parameters
+        //...
         return new ViewHolder(savedPsgView);
     }
+
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
         final MemoryPassage psg = lstSavedPsgs.get(position);
-        holder.setPassageTitle(psg.getPsgReference());
-        holder.getPassageTitle().setOnClickListener(new View.OnClickListener() {
+        // - replace the contents of the view with given passage
+        holder.txtPsgRef.setText(psg.getPsgReference());
+        holder.txtExercMsg.setText(psg.getExercMsg());
+        holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                //Open new exercise activity, display text
+                //Open new exercise activity, pass psg along with intent
+                //May need to calculate currentTimeMillis and pass along to standardize
+                //calculations (not sure if this is necessary)
                 Intent intent = new Intent(mContext, MemoryExercise.class);
                 intent.putExtra(PSG_KEY, psg);
                 mContext.startActivity(intent);
@@ -84,6 +74,26 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
     @Override
     public int getItemCount() {
         return lstSavedPsgs.size();
+    }
+
+    // Provide a reference to the views for each data item
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+
+        private TextView txtPsgRef;
+        private TextView txtExercMsg;
+        //used for click event
+        private View mView;
+
+        private ViewHolder(View savedPsgView) {
+            super(savedPsgView);
+
+            //Link java to views inflated from view model XML
+            txtPsgRef = savedPsgView.findViewById(R.id.txtPsgRef);
+            txtExercMsg = savedPsgView.findViewById(R.id.txtExercMsg);
+
+            //Sets clickbox to entire inflated view
+            mView = savedPsgView;
+        }
     }
 }
 

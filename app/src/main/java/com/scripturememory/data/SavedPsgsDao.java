@@ -45,6 +45,11 @@ public class SavedPsgsDao {
         mDatabase.insert(SavedPsgsTable.TABLE_SAVEDPSGS, null, values);
     }
 
+    public void updatePsg(MemoryPassage psg){
+        ContentValues values = TransformData.psgToValues(psg);
+        mDatabase.update(SavedPsgsTable.TABLE_SAVEDPSGS, values, "verseID=" + psg.getPsgID(),null);
+    }
+
     public long getSavedPsgCount() {
         return DatabaseUtils.queryNumEntries(mDatabase, SavedPsgsTable.TABLE_SAVEDPSGS);
     }
@@ -55,6 +60,7 @@ public class SavedPsgsDao {
         //Equivalent to Java resultset class
         //Sorts and filters can be implemented using the additional parameters
         //See "Filter and sort Data lesson" in Local Data Storage video for implementing filters
+        //Is it better to filter and sort at database level or collection level?
         Cursor cursor = mDatabase.query(SavedPsgsTable.TABLE_SAVEDPSGS, SavedPsgsTable.ALL_COLUMNS, null, null, null, null, null);
 
         while(cursor.moveToNext()){
@@ -66,6 +72,11 @@ public class SavedPsgsDao {
             psg.setStartVerse(cursor.getInt(cursor.getColumnIndex(SavedPsgsTable.COLUMN_STARTVERSE)));
             psg.setEndVerse(cursor.getInt(cursor.getColumnIndex(SavedPsgsTable.COLUMN_ENDVERSE)));
             psg.setText(cursor.getString(cursor.getColumnIndex(SavedPsgsTable.COLUMN_TEXT)));
+            psg.setLastExerc(cursor.getLong(cursor.getColumnIndex(SavedPsgsTable.COLUMN_LASTEXERC)));
+            psg.setNextExerc(cursor.getLong(cursor.getColumnIndex(SavedPsgsTable.COLUMN_NEXTEXERC)));
+            psg.setCurrentSeq(cursor.getInt(cursor.getColumnIndex(SavedPsgsTable.COLUMN_CURRENTSEQ)));
+            psg.setPrevSeq(cursor.getInt(cursor.getColumnIndex(SavedPsgsTable.COLUMN_PREVSEQ)));
+            psg.setExercMsg(cursor.getString(cursor.getColumnIndex(SavedPsgsTable.COLUMN_EXERCMSG)));
             lstSavedPsgs.add(psg);
         }
         return lstSavedPsgs;

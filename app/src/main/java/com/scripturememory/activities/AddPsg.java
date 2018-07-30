@@ -20,8 +20,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
-import com.scripturememory.adapters.AddVerseAdapter;
-import com.scripturememory.adapters.AddVerseAdapter.OnChildClickListener;
+import com.scripturememory.adapters.AddPsgAdapter;
+import com.scripturememory.adapters.AddPsgAdapter.OnChildClickListener;
 import com.scripturememory.data.SavedPsgsService;
 import com.scripturememory.models.AddVerseExpandableGroup;
 import com.scripturememory.models.AddVerseExpandableItem;
@@ -33,7 +33,7 @@ import com.scripturememory.models.MemoryPassage;
 import com.scripturememory.R;
 import com.scripturememory.network.ScriptureClient;
 
-public class AddVerse extends AppCompatActivity implements OnChildClickListener {
+public class AddPsg extends AppCompatActivity implements OnChildClickListener {
 
     private Logger logger = Logger.getLogger(getClass().toString());
 
@@ -46,7 +46,7 @@ public class AddVerse extends AppCompatActivity implements OnChildClickListener 
     private MemoryPassage foundPassage;
     private Map<String, Book> mapNameToBook;
     private RecyclerView recyclerView;
-    private AddVerseAdapter addVerseAdapter;
+    private AddPsgAdapter addPsgAdapter;
     private List<AddVerseExpandableGroup> groupList = new ArrayList<>();
 
     @Override
@@ -66,10 +66,9 @@ public class AddVerse extends AppCompatActivity implements OnChildClickListener 
         groupList.add(new AddVerseExpandableGroup("Book", new ArrayList<AddVerseExpandableItem>()));
         groupList.add(new AddVerseExpandableGroup("Chapter", new ArrayList<AddVerseExpandableItem>()));
         groupList.add(new AddVerseExpandableGroup("Verse", new ArrayList<AddVerseExpandableItem>()));
-        addVerseAdapter = new AddVerseAdapter(groupList, AddVerse.this);
-        recyclerView.setAdapter(addVerseAdapter);
+        addPsgAdapter = new AddPsgAdapter(groupList, AddPsg.this);
+        recyclerView.setAdapter(addPsgAdapter);
         populateLanguages();
-
         mapNameToBook = new HashMap<>();
     }
 
@@ -89,8 +88,8 @@ public class AddVerse extends AppCompatActivity implements OnChildClickListener 
                     languageExpandableItems.add(new AddVerseExpandableItem(languageTitle));
                 }
                 groupList.set(0, new AddVerseExpandableGroup("Language", languageExpandableItems));
-                addVerseAdapter = new AddVerseAdapter(groupList, AddVerse.this);
-                recyclerView.setAdapter(addVerseAdapter);
+                addPsgAdapter = new AddPsgAdapter(groupList, AddPsg.this);
+                recyclerView.setAdapter(addPsgAdapter);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -116,8 +115,8 @@ public class AddVerse extends AppCompatActivity implements OnChildClickListener 
                     versionsExpandableItems.add(new AddVerseExpandableItem(bibleVersionTitle));
                 }
                 groupList.set(1, new AddVerseExpandableGroup("Bible Version", versionsExpandableItems));
-                addVerseAdapter = new AddVerseAdapter(groupList, AddVerse.this);
-                recyclerView.setAdapter(addVerseAdapter);
+                addPsgAdapter = new AddPsgAdapter(groupList, AddPsg.this);
+                recyclerView.setAdapter(addPsgAdapter);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -144,8 +143,8 @@ public class AddVerse extends AppCompatActivity implements OnChildClickListener 
                     booksExpandableItems.add(new AddVerseExpandableItem(book.getBookName()));
                 }
                 groupList.set(2, new AddVerseExpandableGroup("Book", booksExpandableItems));
-                addVerseAdapter = new AddVerseAdapter(groupList, AddVerse.this);
-                recyclerView.setAdapter(addVerseAdapter);
+                addPsgAdapter = new AddPsgAdapter(groupList, AddPsg.this);
+                recyclerView.setAdapter(addPsgAdapter);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -187,8 +186,8 @@ public class AddVerse extends AppCompatActivity implements OnChildClickListener 
                                         versesExpandableItems.add(new AddVerseExpandableItem(Integer.toString(verseNumber)));
                                     }
                                     groupList.set(4, new AddVerseExpandableGroup("Verse", versesExpandableItems));
-                                    addVerseAdapter = new AddVerseAdapter(groupList, AddVerse.this);
-                                    recyclerView.setAdapter(addVerseAdapter);
+                                    addPsgAdapter = new AddPsgAdapter(groupList, AddPsg.this);
+                                    recyclerView.setAdapter(addPsgAdapter);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -205,8 +204,8 @@ public class AddVerse extends AppCompatActivity implements OnChildClickListener 
                         versesExpandableItems.add(new AddVerseExpandableItem(Integer.toString(verseNumber)));
                     }
                     groupList.set(4, new AddVerseExpandableGroup("Verse", versesExpandableItems));
-                    addVerseAdapter = new AddVerseAdapter(groupList, AddVerse.this);
-                    recyclerView.setAdapter(addVerseAdapter);
+                    addPsgAdapter = new AddPsgAdapter(groupList, AddPsg.this);
+                    recyclerView.setAdapter(addPsgAdapter);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -293,8 +292,8 @@ public class AddVerse extends AppCompatActivity implements OnChildClickListener 
                 chaptersExpandableItems.add(new AddVerseExpandableItem(Integer.toString(i)));
             }
             groupList.set(3, new AddVerseExpandableGroup("Chapter", chaptersExpandableItems));
-            addVerseAdapter = new AddVerseAdapter(groupList, AddVerse.this);
-            recyclerView.setAdapter(addVerseAdapter);
+            addPsgAdapter = new AddPsgAdapter(groupList, AddPsg.this);
+            recyclerView.setAdapter(addPsgAdapter);
         } else if (group.getTitle().equals("Chapter")) {
             selectedChapter = Integer.parseInt(group.getSelection());
             String selectedBookId = mapNameToBook.get(selectedBookName).getBookId();

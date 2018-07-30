@@ -21,9 +21,9 @@ android {
         main {
             res.srcDirs =
                     [
-                            'src/main/res/layouts/add_verse',
+                            'src/main/res/layouts/add_psg',
                             'src/main/res/layouts/memory_exercise',
-                            'src/main/res/layouts/saved_verses',
+                            'src/main/res/layouts/saved_psgs',
                             'src/main/res/layouts',
                             'src/main/res'
                     ]

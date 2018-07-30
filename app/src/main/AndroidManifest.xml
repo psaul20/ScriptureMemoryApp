@@ -17,7 +17,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.AddVerse"
+            android:name=".activities.AddPsg"
             android:parentActivityName=".activities.SavedPassages">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

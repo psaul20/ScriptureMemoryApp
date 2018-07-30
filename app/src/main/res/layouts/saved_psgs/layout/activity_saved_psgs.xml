@@ -28,6 +28,6 @@
 
     <include
         android:id="@+id/include"
-        layout="@layout/content_saved_verses" />
+        layout="@layout/content_saved_psgs" />
 
 </android.support.design.widget.CoordinatorLayout>
