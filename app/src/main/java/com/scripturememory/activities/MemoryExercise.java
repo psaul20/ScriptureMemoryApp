@@ -22,8 +22,7 @@ public class MemoryExercise extends AppCompatActivity {
 
         //Retrieve appropriate passage from intent parcelable
         final MemoryPassage psg = getIntent().getExtras().getParcelable(SavedPsgAdapter.PSG_KEY);
-        if (psg != null)
-        {
+        if (psg != null) {
             TextView txtPsgRef = findViewById(R.id.txtPsgRef);
             TextView txtPsgText = findViewById(R.id.txtPsgText);
             Button btnCancel = findViewById(R.id.btnCancel);
@@ -64,7 +63,7 @@ public class MemoryExercise extends AppCompatActivity {
     }
 
     //Could possibly move this and other algorithm-related methods into it's own class
-    private void endExercise(MemoryPassage psg){
+    private void endExercise(MemoryPassage psg) {
 
         //First exercise case - start interval regardless of success or failure
         if (psg.getCurrentSeq() == 0){
@@ -72,18 +71,14 @@ public class MemoryExercise extends AppCompatActivity {
             psg.setPrevSeq(0);
             psg.setLastExerc(System.currentTimeMillis());
             finish();
-        }
-
-        else{
+        } else {
             long lngTimePassed = System.currentTimeMillis() - psg.getLastExerc();
             if(blnSuccess){
                 //Underdue case - do nothing
-                if(lngTimePassed < psg.getCurrentSeq() * 3600000L){
+                if(lngTimePassed < psg.getCurrentSeq() * 3600000L) {
                     finish();
-                }
-
-                //Exercise ready case - increase fibonacci interval
-                else{
+                } else{
+                    //Exercise ready case - increase fibonacci interval
                     int intHolder = psg.getPrevSeq();
                     psg.setPrevSeq(psg.getCurrentSeq());
                     psg.setCurrentSeq(psg.getCurrentSeq() + intHolder);
@@ -91,21 +86,17 @@ public class MemoryExercise extends AppCompatActivity {
                     updateDB(psg);
                     finish();
                 }
-            }
-
-            else{
+            } else {
                 //Overdue case - reduce interval
-                if(lngTimePassed > psg.getNextExerc() + psg.getPrevSeq() * 3600000L){
+                if(lngTimePassed > psg.getNextExerc() + psg.getPrevSeq() * 3600000L) {
                     int intHolder = psg.getCurrentSeq();
                     psg.setCurrentSeq(psg.getPrevSeq());
                     psg.setPrevSeq(intHolder - psg.getPrevSeq());
                     psg.setLastExerc(System.currentTimeMillis());
                     updateDB(psg);
                     finish();
-                }
-
-                //Normal failure case - maintain interval
-                else{
+                } else {
+                    //Normal failure case - maintain interval
                     psg.setLastExerc(System.currentTimeMillis());
                     updateDB(psg);
                     finish();
@@ -115,7 +106,7 @@ public class MemoryExercise extends AppCompatActivity {
 
     }
 
-    private void updateDB (MemoryPassage psg){
+    private void updateDB (MemoryPassage psg) {
         SavedPsgsService mSavedPsgsService = new SavedPsgsService(this);
         mSavedPsgsService.openDb();
         mSavedPsgsService.updatePsg(psg);
