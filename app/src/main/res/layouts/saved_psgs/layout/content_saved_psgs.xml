@@ -5,8 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.scripturememory.SavedPassages"
-    tools:showIn="@layout/activity_saved_psgs">
+    tools:context="com.scripturememory.activities.SavedPassages"
+    tools:showIn="@layout/activity_saved_psgs"
+    android:background="@color/colorBackground">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rcvSavedVerses"
