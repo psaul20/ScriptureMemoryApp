@@ -25,7 +25,6 @@ public class MemoryExercise extends AppCompatActivity {
         if (psg != null) {
             TextView txtPsgRef = findViewById(R.id.txtPsgRef);
             TextView txtPsgText = findViewById(R.id.txtPsgText);
-            Button btnCancel = findViewById(R.id.btnCancel);
             Button btnSuccess = findViewById(R.id.btnSuccess);
             Button btnFail = findViewById(R.id.btnFail);
 
@@ -33,13 +32,6 @@ public class MemoryExercise extends AppCompatActivity {
             txtPsgRef.setText(psg.getPsgReference());
 
             txtPsgText.setText(psg.getText());
-
-            btnCancel.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    finish();
-                }
-            });
 
             btnSuccess.setOnClickListener(new View.OnClickListener() {
                 @Override
