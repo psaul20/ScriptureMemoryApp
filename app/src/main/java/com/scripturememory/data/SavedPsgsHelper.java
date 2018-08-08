@@ -13,7 +13,7 @@ public class SavedPsgsHelper extends SQLiteOpenHelper {
     //this should be changed to reflect the name of the app?
     private static final String DB_FILE_NAME = "ScriptureMemory.db";
     //this should be changed if the DB is ever changed
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
 
     public SavedPsgsHelper(Context context) {
         super(context, DB_FILE_NAME, null, DB_VERSION);

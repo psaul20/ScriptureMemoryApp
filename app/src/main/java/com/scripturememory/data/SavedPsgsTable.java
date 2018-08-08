@@ -6,7 +6,7 @@ package com.scripturememory.data;
  */
 public class SavedPsgsTable {
     public static final String TABLE_SAVEDPSGS = "savedPsgs";
-    public static final String COLUMN_ID = "verseId";
+    public static final String COLUMN_ID = "psgID";
     public static final String COLUMN_TRANSLATION = "translation";
     public static final String COLUMN_BOOK = "book";
     public static final String COLUMN_CHAPTER = "chapter";

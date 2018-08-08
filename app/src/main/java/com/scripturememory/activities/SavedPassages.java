@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.scripturememory.algorithm.ExerciseScheduling;
 import com.scripturememory.data.SavedPsgsService;
 import com.scripturememory.models.MemoryPassage;
 import com.scripturememory.R;
@@ -34,13 +35,11 @@ public class SavedPassages extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fabAddPsg = (FloatingActionButton) findViewById(R.id.fabAddVerse);
+        FloatingActionButton fabAddPsg = findViewById(R.id.fabAddVerse);
         fabAddPsg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(SavedPassages.this, AddPsg.class));
-                Snackbar.make(view, "Passage Saved", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
             }
         });
 
@@ -55,9 +54,10 @@ public class SavedPassages extends AppCompatActivity {
         //Declare and specify layout manager for RecyclerView
         rcvSavedVerses.setLayoutManager(new LinearLayoutManager(this));
 
+        long lngCurrentTimeMillis = System.currentTimeMillis();
+
             for (MemoryPassage psg:lstSavedPsgs) {
-                psg.calcNextExerc();
-                psg.buildExercMsg();
+                ExerciseScheduling.buildExercMsg(psg, lngCurrentTimeMillis);
             }
 
             //Sort items coming due sooner first
@@ -97,6 +97,24 @@ public class SavedPassages extends AppCompatActivity {
     protected void onResume(){
         super.onResume();
         savedPsgsService.openDb();
+        lstSavedPsgs = savedPsgsService.getAllPsgs();
+
+        long lngCurrentTimeMillis = System.currentTimeMillis();
+
+        for (MemoryPassage psg:lstSavedPsgs) {
+            ExerciseScheduling.buildExercMsg(psg, lngCurrentTimeMillis);
+        }
+
+        //Sort items coming due sooner first
+        Collections.sort(lstSavedPsgs, new Comparator<MemoryPassage>() {
+            public int compare(MemoryPassage one, MemoryPassage other){
+                return Long.compare(one.getNextExerc(), other.getNextExerc());
+            }
+        });
+
+        //Declare and specify adapter for RecyclerView. See SavedPsgAdapter Class
+        RecyclerView.Adapter adapter = new SavedPsgAdapter(this, lstSavedPsgs);
+        rcvSavedVerses.setAdapter(adapter);
     }
 
 

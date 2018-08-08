@@ -47,7 +47,8 @@ public class SavedPsgsDao {
 
     public void updatePsg(MemoryPassage psg){
         ContentValues values = TransformData.psgToValues(psg);
-        mDatabase.update(SavedPsgsTable.TABLE_SAVEDPSGS, values, "verseID=" + psg.getPsgID(),null);
+        int intRowsUpdated = mDatabase.update(SavedPsgsTable.TABLE_SAVEDPSGS, values, SavedPsgsTable.COLUMN_ID + "='" + psg.getPsgID() + "'", null);
+        logger.info("Rows Updated = " + Integer.toString(intRowsUpdated));
     }
 
     public long getSavedPsgCount() {

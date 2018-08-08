@@ -20,7 +20,11 @@ public class TransformData {
         values.put(SavedPsgsTable.COLUMN_STARTVERSE, psg.getStartVerse());
         values.put(SavedPsgsTable.COLUMN_ENDVERSE, psg.getEndVerse());
         values.put(SavedPsgsTable.COLUMN_TEXT, psg.getText());
-        values.put(SavedPsgsTable.COLUMN_CURRENTSEQ, 0);
+        values.put(SavedPsgsTable.COLUMN_LASTEXERC, psg.getLastExerc());
+        values.put(SavedPsgsTable.COLUMN_NEXTEXERC, psg.getNextExerc());
+        values.put(SavedPsgsTable.COLUMN_CURRENTSEQ, psg.getCurrentSeq());
+        values.put(SavedPsgsTable.COLUMN_PREVSEQ, psg.getPrevSeq());
+        values.put(SavedPsgsTable.COLUMN_EXERCMSG, psg.getExercMsg());
         return values;
     }
 

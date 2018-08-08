@@ -46,8 +46,8 @@ public class MemoryPassage implements Parcelable {
         this.intStartVerse = startVerse;
         this.intEndVerse = endVerse;
         this.strText = text;
-        this.lngLastExerc = -1L;
-        this.lngNextExerc = -1L;
+        this.lngLastExerc = 0L;
+        this.lngNextExerc = 0L;
         this.intCurrentSeq = 0;
         this.intPrevSeq = 0;
         this.strExercMsg = null;
@@ -158,92 +158,6 @@ public class MemoryPassage implements Parcelable {
         return strPsgRef;
     }
 
-    public void calcNextExerc (){
-
-        //Indicates newly added verse
-        if (intCurrentSeq == 0){
-            //100000L buffer added to account for discrepancies caused by processing time (not sure if this is necessary)
-            setNextExerc(System.currentTimeMillis() + 100000L);
-        }
-
-        else {
-            //Find time past since last exercise
-            long lngTimeDiff = System.currentTimeMillis() - getLastExerc();
-            //Convert intCurrentSeq from hours into Millis, subtract to find diff between time past since last
-            //exercise and next exercise time
-            setNextExerc((getCurrentSeq() * 3600000L) - lngTimeDiff);
-        }
-    }
-
-    public void buildExercMsg(){
-
-        long lngUpdatedNextExerc = getNextExerc();
-        long lngExercWindow = getPrevSeq() * 3600000L;
-
-        //Ready to Exercise window = previous sequence time interval
-        if (lngUpdatedNextExerc <= System.currentTimeMillis() + lngExercWindow && lngUpdatedNextExerc >= System.currentTimeMillis()) {
-            setExercMsg("Ready to Exercise!");
-        }
-
-        //Not ready to exercise yet
-        else if (lngUpdatedNextExerc > System.currentTimeMillis() + lngExercWindow){
-            setExercMsg("Next Exercise in " + calcDueDate(lngUpdatedNextExerc));
-        }
-
-        //Past due on exercise
-        else {
-            setExercMsg("Ready To Exercise! " + calcDueDate(lngUpdatedNextExerc) + " overdue");
-        }
-    }
-
-    private String calcDueDate (long lngDueDateMillis){
-        String strReturn = "";
-        long lngYearMillis = 31540000000L;
-        long lngMonthMillis = 2628000000L;
-        long lngWeekMillis = 604800000L;
-        long lngDayMillis = 86400000L;
-        long lngHourMillis = 3600000L;
-        long lngMinuteMillis = 60000L;
-        long lngSecondMillis = 1000L;
-
-        //Years
-        if (lngDueDateMillis / lngYearMillis > 0 || lngDueDateMillis / lngYearMillis < 0){
-            strReturn = Long.toString(abs(lngDueDateMillis / lngYearMillis)) + " years";
-        }
-
-        //Months
-        else if (lngDueDateMillis / lngMonthMillis > 0 || lngDueDateMillis / lngMonthMillis < 0){
-            strReturn = Long.toString(abs(lngDueDateMillis / lngMonthMillis)) + " months";
-        }
-
-        //Weeks
-        else if (lngDueDateMillis / lngWeekMillis > 0 || lngDueDateMillis / lngWeekMillis < 0){
-            strReturn = Long.toString(abs(lngDueDateMillis / lngWeekMillis)) + " weeks";
-        }
-
-        //Days
-        else if (lngDueDateMillis / lngDayMillis > 0 || lngDueDateMillis / lngDayMillis < 0){
-            strReturn = Long.toString(abs(lngDueDateMillis / lngDayMillis)) + " days";
-        }
-
-        //Hours
-        else if (lngDueDateMillis / lngHourMillis > 0 || lngDueDateMillis / lngHourMillis < 0){
-            strReturn = Long.toString(abs(lngDueDateMillis / lngHourMillis)) + " hours";
-        }
-
-        //Minutes
-        else if (lngDueDateMillis / lngMinuteMillis > 0 || lngDueDateMillis / lngMinuteMillis < 0){
-            strReturn = Long.toString(abs(lngDueDateMillis / lngMinuteMillis)) + " minutes";
-        }
-
-        //Seconds
-        else if (lngDueDateMillis / lngSecondMillis > 0 || lngDueDateMillis / lngSecondMillis < 0){
-            strReturn = Long.toString(abs(lngDueDateMillis / lngSecondMillis)) + " seconds";
-        }
-
-        return strReturn;
-    }
-
     //could be useful for creating uniform file names when passages are written to JSON files
     //May not be used now that we are using SQLite for storage
     public String toFileName() {
@@ -251,7 +165,6 @@ public class MemoryPassage implements Parcelable {
         strFileName.replaceAll(":",".");
         return strFileName;
     }
-
 
 
     //Parcelable required methods
