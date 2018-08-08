@@ -31,14 +31,14 @@ public class AddPsgAdapter extends ExpandableRecyclerViewAdapter<AddPsgAdapter.P
     @Override
     public ParentViewHolder onCreateGroupViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.parent_row_add_verse, parent, false);
+        View view = inflater.inflate(R.layout.parent_row_add_psg, parent, false);
         return new ParentViewHolder(view);
     }
 
     @Override
     public SubViewHolder onCreateChildViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.child_row_add_verse, parent, false);
+        View view = inflater.inflate(R.layout.child_row_add_psg, parent, false);
         return new SubViewHolder(view);
     }
 

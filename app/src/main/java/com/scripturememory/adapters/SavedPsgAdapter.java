@@ -28,6 +28,7 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
 
     private List<MemoryPassage> lstSavedPsgs;
     private Context mContext;
+    private MemoryPassage psg;
 
     //set generic constant to store psg on click with intent.putExtra
     public static final String PSG_KEY = "psg_key";
@@ -53,7 +54,7 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
-        final MemoryPassage psg = lstSavedPsgs.get(position);
+        psg = lstSavedPsgs.get(position);
         // - replace the contents of the view with given passage
         holder.txtPsgRef.setText(psg.getPsgReference());
         holder.txtExercMsg.setText(psg.getExercMsg());

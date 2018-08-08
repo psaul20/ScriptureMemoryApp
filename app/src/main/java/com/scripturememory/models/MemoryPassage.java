@@ -184,6 +184,12 @@ public class MemoryPassage implements Parcelable {
         dest.writeInt(this.intStartVerse);
         dest.writeInt(this.intEndVerse);
         dest.writeString(this.strText);
+        dest.writeLong(this.lngLastExerc);
+        dest.writeLong(this.lngNextExerc);
+        dest.writeInt(this.intCurrentSeq);
+        dest.writeInt(this.intPrevSeq);
+        dest.writeString(this.strExercMsg);
+
     }
 
     private MemoryPassage(Parcel in) {
@@ -194,6 +200,11 @@ public class MemoryPassage implements Parcelable {
         this.intStartVerse = in.readInt();
         this.intEndVerse = in.readInt();
         this.strText = in.readString();
+        this.lngLastExerc = in.readLong();
+        this.lngNextExerc = in.readLong();
+        this.intCurrentSeq = in.readInt();
+        this.intPrevSeq = in.readInt();
+        this.strExercMsg = in.readString();
     }
 
     public static final Parcelable.Creator<MemoryPassage> CREATOR = new Parcelable.Creator<MemoryPassage>() {
