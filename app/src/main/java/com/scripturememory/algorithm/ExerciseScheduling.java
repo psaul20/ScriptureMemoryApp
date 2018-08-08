@@ -117,7 +117,7 @@ public class ExerciseScheduling {
             //SuccessCases
             if(ExerciseSuccess){
                 //Underdue case - do nothing
-                if(lngTimePassedSinceLastExerc < psg.getCurrentSeq() * lngHourMillis) {
+                if(lngTimePassedSinceLastExerc < psg.getPrevSeq() * lngHourMillis) {
                     blnUpdateDb = false;
                     return blnUpdateDb;
                 }
