@@ -52,7 +52,7 @@ public class AddPsg extends AppCompatActivity implements OnChildClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_verse);
+        setContentView(R.layout.activity_add_psg);
 
         mSavedPsgsService = new SavedPsgsService(this);
         mSavedPsgsService.openDb();

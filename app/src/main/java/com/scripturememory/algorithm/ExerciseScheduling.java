@@ -60,38 +60,74 @@ public class ExerciseScheduling {
         String strReturn = "";
 
         //Years
+
         if (lngDueDateMillis / lngYearMillis > 0 || lngDueDateMillis / lngYearMillis < 0){
-            strReturn = Long.toString(abs(lngDueDateMillis / lngYearMillis)) + " years";
+            if (abs(lngDueDateMillis / lngYearMillis) == 1L){
+                strReturn = Long.toString(abs(lngDueDateMillis / lngYearMillis)) + " year";
+            }
+            else {
+                strReturn = Long.toString(abs(lngDueDateMillis / lngYearMillis)) + " years";
+            }
         }
 
         //Months
         else if (lngDueDateMillis / lngMonthMillis > 0 || lngDueDateMillis / lngMonthMillis < 0){
-            strReturn = Long.toString(abs(lngDueDateMillis / lngMonthMillis)) + " months";
+            if (abs(lngDueDateMillis / lngMonthMillis) == 1L){
+                strReturn = Long.toString(abs(lngDueDateMillis / lngMonthMillis)) + " month";
+            }
+            else {
+                strReturn = Long.toString(abs(lngDueDateMillis / lngMonthMillis)) + " months";
+            }
         }
 
         //Weeks
         else if (lngDueDateMillis / lngWeekMillis > 0 || lngDueDateMillis / lngWeekMillis < 0){
-            strReturn = Long.toString(abs(lngDueDateMillis / lngWeekMillis)) + " weeks";
+            if (abs(lngDueDateMillis / lngWeekMillis) == 1L){
+                strReturn = Long.toString(abs(lngDueDateMillis / lngWeekMillis)) + " week";
+            }
+            else {
+                strReturn = Long.toString(abs(lngDueDateMillis / lngWeekMillis)) + " weeks";
+            }
         }
 
         //Days
         else if (lngDueDateMillis / lngDayMillis > 0 || lngDueDateMillis / lngDayMillis < 0){
-            strReturn = Long.toString(abs(lngDueDateMillis / lngDayMillis)) + " days";
+            if (abs(lngDueDateMillis / lngDayMillis) == 1L){
+                strReturn = Long.toString(abs(lngDueDateMillis / lngDayMillis)) + " day";
+            }
+            else {
+                strReturn = Long.toString(abs(lngDueDateMillis / lngDayMillis)) + " days";
+            }
         }
 
         //Hours
         else if (lngDueDateMillis / lngHourMillis > 0 || lngDueDateMillis / lngHourMillis < 0){
-            strReturn = Long.toString(abs(lngDueDateMillis / lngHourMillis)) + " hours";
+            if (abs(lngDueDateMillis / lngHourMillis) == 1L){
+                strReturn = Long.toString(abs(lngDueDateMillis / lngHourMillis)) + " hour";
+            }
+            else {
+                strReturn = Long.toString(abs(lngDueDateMillis / lngHourMillis)) + " hours";
+            }
         }
 
         //Minutes
         else if (lngDueDateMillis / lngMinuteMillis > 0 || lngDueDateMillis / lngMinuteMillis < 0){
-            strReturn = Long.toString(abs(lngDueDateMillis / lngMinuteMillis)) + " minutes";
+            if (abs(lngDueDateMillis / lngMinuteMillis) == 1L){
+                strReturn = Long.toString(abs(lngDueDateMillis / lngMinuteMillis)) + " minute";
+            }
+            else {
+                strReturn = Long.toString(abs(lngDueDateMillis / lngMinuteMillis)) + " minutes";
+            }
         }
 
         //Seconds
         else if (lngDueDateMillis / lngSecondMillis > 0 || lngDueDateMillis / lngSecondMillis < 0){
-            strReturn = Long.toString(abs(lngDueDateMillis / lngSecondMillis)) + " seconds";
+            if (abs(lngDueDateMillis / lngSecondMillis) == 1L){
+                strReturn = Long.toString(abs(lngDueDateMillis / lngSecondMillis)) + " second";
+            }
+            else {
+                strReturn = Long.toString(abs(lngDueDateMillis / lngSecondMillis)) + " seconds";
+            }
         }
 
         return strReturn;
@@ -114,7 +150,7 @@ public class ExerciseScheduling {
         else {
             long lngTimePassedSinceLastExerc = ExercStartMillis - psg.getLastExerc();
 
-            //SuccessCases
+            //Exercise success cases
             if(ExerciseSuccess){
                 //Underdue case - do nothing
                 if(lngTimePassedSinceLastExerc < psg.getPrevSeq() * lngHourMillis) {
