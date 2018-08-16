@@ -140,7 +140,7 @@ public class ExerciseScheduling {
         //First exercise case - start interval regardless of success or failure
         if (psg.getNextExerc() == 0){
             psg.setCurrentSeq(1);
-            psg.setPrevSeq(0);
+            psg.setPrevSeq(1);
             psg.setLastExerc(ExercStartMillis);
             psg.setNextExerc(ExercStartMillis + psg.getCurrentSeq() * lngHourMillis);
 

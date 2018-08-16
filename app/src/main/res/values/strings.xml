@@ -2,6 +2,6 @@
     <string name="app_name">Scripture Memory</string>
     <string name="action_settings">Settings</string>
     <string name="blank_space">____</string>
-    <string name="channel_name">Channel</string>
-    <string name="channel_description">ChanDescription</string>
+    <string name="channel_name">Exercise Reminder</string>
+    <string name="channel_description">Choose whether or not the app notifies you when Bible Passages are ready for review</string>
 </resources>
