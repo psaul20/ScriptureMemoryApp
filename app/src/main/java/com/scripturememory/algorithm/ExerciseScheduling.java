@@ -138,7 +138,7 @@ public class ExerciseScheduling {
         boolean blnUpdateDb = true;
 
         //First exercise case - start interval regardless of success or failure
-        if (psg.getNextExerc() == 0){
+        if (psg.getCurrentSeq() == 0){
             psg.setCurrentSeq(1);
             psg.setPrevSeq(1);
             psg.setLastExerc(ExercStartMillis);
@@ -172,8 +172,8 @@ public class ExerciseScheduling {
 
             //Exercise failure cases
             else {
-                //Overdue case - reduce interval
-                if(ExercStartMillis > psg.getNextExerc() + psg.getPrevSeq() * lngHourMillis) {
+                //Overdue case - reduce interval unless current sequence = 1
+                if(ExercStartMillis > psg.getNextExerc() + psg.getPrevSeq() * lngHourMillis && psg.getCurrentSeq() != 1) {
                     int intHolder = psg.getCurrentSeq();
                     psg.setCurrentSeq(psg.getPrevSeq());
                     psg.setPrevSeq(intHolder - psg.getPrevSeq());
