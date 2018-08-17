@@ -28,15 +28,18 @@ public class ExerciseScheduling {
 //We will need string literals for these eventually
     public static void buildExercMsg(MemoryPassage psg, long CurrentTimeMillis){
 
+        //Flag to return only the largest unit of time
+        boolean blnOnlyBiggest = false;
+
         long lngNextExerc = psg.getNextExerc();
-        //
+
         long lngTimeUntilExerc = lngNextExerc - CurrentTimeMillis;
         //Ready to Exercise window = next scheduled exercise time plus previous fib sequence time interval
         long lngExercWindow = psg.getPrevSeq() * lngHourMillis;
 
         //Newly Added Passage
         if (lngNextExerc == 0){
-            psg.setExercMsg("Ready To Exercise!");
+            psg.setExercMsg("Ready to Exercise!");
         }
 
         //If within exercise window, ready to exercise
@@ -46,87 +49,138 @@ public class ExerciseScheduling {
 
         //Not ready to exercise yet
         else if (CurrentTimeMillis < lngNextExerc){
-            psg.setExercMsg("Next Exercise in " + calcTimeUntil(lngTimeUntilExerc));
+            psg.setExercMsg("Next Exercise in " + calcTimeUntil(lngTimeUntilExerc, blnOnlyBiggest));
         }
 
         //Past due on exercise
         else {
-            psg.setExercMsg("Ready To Exercise! " + calcTimeUntil(lngTimeUntilExerc) + " overdue");
+            blnOnlyBiggest = true;
+            psg.setExercMsg("Ready to Exercise! " + calcTimeUntil(lngTimeUntilExerc, blnOnlyBiggest) + "overdue");
         }
     }
 
-    private static String calcTimeUntil(long lngDueDateMillis){
+    private static String calcTimeUntil(long lngDueDateMillis, boolean blnOnlyBiggest){
 
         String strReturn = "";
 
         //Years
-
         if (lngDueDateMillis / lngYearMillis > 0 || lngDueDateMillis / lngYearMillis < 0){
             if (abs(lngDueDateMillis / lngYearMillis) == 1L){
-                strReturn = Long.toString(abs(lngDueDateMillis / lngYearMillis)) + " year";
+                strReturn = strReturn + Long.toString(abs(lngDueDateMillis / lngYearMillis)) + " year ";
             }
             else {
-                strReturn = Long.toString(abs(lngDueDateMillis / lngYearMillis)) + " years";
+                strReturn = strReturn + Long.toString(abs(lngDueDateMillis / lngYearMillis)) + " years ";
+            }
+
+            if(blnOnlyBiggest){
+                return strReturn;
+            }
+
+            else {
+                lngDueDateMillis = lngDueDateMillis % lngYearMillis;
             }
         }
 
         //Months
-        else if (lngDueDateMillis / lngMonthMillis > 0 || lngDueDateMillis / lngMonthMillis < 0){
+        if (lngDueDateMillis / lngMonthMillis > 0 || lngDueDateMillis / lngMonthMillis < 0){
             if (abs(lngDueDateMillis / lngMonthMillis) == 1L){
-                strReturn = Long.toString(abs(lngDueDateMillis / lngMonthMillis)) + " month";
+                strReturn = strReturn + Long.toString(abs(lngDueDateMillis / lngMonthMillis)) + " month ";
             }
             else {
-                strReturn = Long.toString(abs(lngDueDateMillis / lngMonthMillis)) + " months";
+                strReturn = strReturn + Long.toString(abs(lngDueDateMillis / lngMonthMillis)) + " months ";
+            }
+
+            if(blnOnlyBiggest){
+                return strReturn;
+            }
+
+            else {
+                lngDueDateMillis = lngDueDateMillis % lngMonthMillis;
             }
         }
 
         //Weeks
-        else if (lngDueDateMillis / lngWeekMillis > 0 || lngDueDateMillis / lngWeekMillis < 0){
+        if (lngDueDateMillis / lngWeekMillis > 0 || lngDueDateMillis / lngWeekMillis < 0){
             if (abs(lngDueDateMillis / lngWeekMillis) == 1L){
-                strReturn = Long.toString(abs(lngDueDateMillis / lngWeekMillis)) + " week";
+                strReturn = strReturn + Long.toString(abs(lngDueDateMillis / lngWeekMillis)) + " week ";
             }
             else {
-                strReturn = Long.toString(abs(lngDueDateMillis / lngWeekMillis)) + " weeks";
+                strReturn = strReturn + Long.toString(abs(lngDueDateMillis / lngWeekMillis)) + " weeks ";
+            }
+
+            if(blnOnlyBiggest){
+                return strReturn;
+            }
+
+            else {
+                lngDueDateMillis = lngDueDateMillis % lngWeekMillis;
             }
         }
 
         //Days
-        else if (lngDueDateMillis / lngDayMillis > 0 || lngDueDateMillis / lngDayMillis < 0){
+        if (lngDueDateMillis / lngDayMillis > 0 || lngDueDateMillis / lngDayMillis < 0){
             if (abs(lngDueDateMillis / lngDayMillis) == 1L){
-                strReturn = Long.toString(abs(lngDueDateMillis / lngDayMillis)) + " day";
+                strReturn = strReturn + Long.toString(abs(lngDueDateMillis / lngDayMillis)) + " day ";
             }
             else {
-                strReturn = Long.toString(abs(lngDueDateMillis / lngDayMillis)) + " days";
+                strReturn = strReturn + Long.toString(abs(lngDueDateMillis / lngDayMillis)) + " days ";
+            }
+
+            if(blnOnlyBiggest){
+                return strReturn;
+            }
+
+            else {
+                lngDueDateMillis = lngDueDateMillis % lngDayMillis;
             }
         }
 
         //Hours
-        else if (lngDueDateMillis / lngHourMillis > 0 || lngDueDateMillis / lngHourMillis < 0){
+        if (lngDueDateMillis / lngHourMillis > 0 || lngDueDateMillis / lngHourMillis < 0){
             if (abs(lngDueDateMillis / lngHourMillis) == 1L){
-                strReturn = Long.toString(abs(lngDueDateMillis / lngHourMillis)) + " hour";
+                strReturn = strReturn + Long.toString(abs(lngDueDateMillis / lngHourMillis)) + " hour ";
             }
             else {
-                strReturn = Long.toString(abs(lngDueDateMillis / lngHourMillis)) + " hours";
+                strReturn = strReturn + Long.toString(abs(lngDueDateMillis / lngHourMillis)) + " hours ";
+            }
+
+            if(blnOnlyBiggest){
+                return strReturn;
+            }
+
+            else {
+                lngDueDateMillis = lngDueDateMillis % lngHourMillis;
             }
         }
 
         //Minutes
-        else if (lngDueDateMillis / lngMinuteMillis > 0 || lngDueDateMillis / lngMinuteMillis < 0){
+        if (lngDueDateMillis / lngMinuteMillis > 0 || lngDueDateMillis / lngMinuteMillis < 0){
             if (abs(lngDueDateMillis / lngMinuteMillis) == 1L){
-                strReturn = Long.toString(abs(lngDueDateMillis / lngMinuteMillis)) + " minute";
+                strReturn = strReturn + Long.toString(abs(lngDueDateMillis / lngMinuteMillis)) + " minute ";
             }
             else {
-                strReturn = Long.toString(abs(lngDueDateMillis / lngMinuteMillis)) + " minutes";
+                strReturn = strReturn + Long.toString(abs(lngDueDateMillis / lngMinuteMillis)) + " minutes ";
             }
+
+            if(blnOnlyBiggest){
+                return strReturn;
+            }
+
+            //Don't pass on to seconds, minutes will be largest time interval for composite message
+
         }
 
         //Seconds
         else if (lngDueDateMillis / lngSecondMillis > 0 || lngDueDateMillis / lngSecondMillis < 0){
             if (abs(lngDueDateMillis / lngSecondMillis) == 1L){
-                strReturn = Long.toString(abs(lngDueDateMillis / lngSecondMillis)) + " second";
+                strReturn = Long.toString(abs(lngDueDateMillis / lngSecondMillis)) + " second ";
             }
             else {
-                strReturn = Long.toString(abs(lngDueDateMillis / lngSecondMillis)) + " seconds";
+                strReturn = Long.toString(abs(lngDueDateMillis / lngSecondMillis)) + " seconds ";
+            }
+
+            if(blnOnlyBiggest){
+                return strReturn;
             }
         }
 
