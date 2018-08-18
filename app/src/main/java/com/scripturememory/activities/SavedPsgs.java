@@ -1,6 +1,8 @@
 package com.scripturememory.activities;
 
 import android.app.AlarmManager;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -16,6 +18,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -23,6 +26,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.scripturememory.Interfaces.ItemClickListener;
+import com.scripturememory.fragments.DeletePsgDialogFragment;
 import com.scripturememory.notifications.NotificationReceiver;
 import com.scripturememory.algorithm.ExerciseScheduling;
 import com.scripturememory.data.SavedPsgsService;
@@ -30,7 +35,12 @@ import com.scripturememory.models.MemoryPassage;
 import com.scripturememory.R;
 import com.scripturememory.adapters.SavedPsgAdapter;
 
-public class SavedPassages extends AppCompatActivity {
+import static com.scripturememory.adapters.SavedPsgAdapter.PSG_KEY;
+
+public class SavedPsgs extends AppCompatActivity
+        implements
+        ItemClickListener,
+        DeletePsgDialogFragment.DeletePassageDialogListener {
 
     private RecyclerView rcvSavedPsgs;
     private List<MemoryPassage> lstSavedPsgs = new ArrayList<>();
@@ -50,7 +60,7 @@ public class SavedPassages extends AppCompatActivity {
         fabAddPsg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(SavedPassages.this, AddPsg.class));
+                startActivity(new Intent(SavedPsgs.this, AddPsg.class));
             }
         });
 
@@ -85,8 +95,9 @@ public class SavedPassages extends AppCompatActivity {
         rcvSavedPsgs.setLayoutManager(new LinearLayoutManager(this));
 
         //Declare and specify adapter for RecyclerView. See SavedPsgAdapter Class
-        RecyclerView.Adapter adapter = new SavedPsgAdapter(this, lstSavedPsgs);
+        SavedPsgAdapter adapter = new SavedPsgAdapter(this, lstSavedPsgs);
         rcvSavedPsgs.setAdapter(adapter);
+        adapter.setClickListener(this);
 
         if (!lstSavedPsgs.isEmpty()) {
 
@@ -112,9 +123,7 @@ public class SavedPassages extends AppCompatActivity {
 
             }
 
-        }
-
-        else {
+        } else {
             rcvSavedPsgs.setVisibility(View.GONE);
             TextView txtNoPsgs = findViewById(R.id.txtNoPsgs);
             txtNoPsgs.setVisibility(View.VISIBLE);
@@ -137,9 +146,9 @@ public class SavedPassages extends AppCompatActivity {
         }
     }
 
-    private Notification buildNotification (){
+    private Notification buildNotification() {
 
-        Intent mIntent = new Intent(this, SavedPassages.class);
+        Intent mIntent = new Intent(this, SavedPsgs.class);
         mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent mPendingIntent = PendingIntent.getActivity(this, 0, mIntent, 0);
 
@@ -158,17 +167,88 @@ public class SavedPassages extends AppCompatActivity {
     }
 
 
-    private void scheduleNotification(Notification notification, long NotificationTime){
+    private void scheduleNotification(Notification notification, long NotificationTime) {
         Intent mIntent = new Intent(this, NotificationReceiver.class);
         mIntent.putExtra(NotificationReceiver.NOTIFICATION_ID, 1);
         mIntent.putExtra(NotificationReceiver.NOTIFICATION, notification);
         PendingIntent mPendingIntent = PendingIntent.getBroadcast(this, 0, mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        AlarmManager mAlarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        AlarmManager mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         mAlarmManager.set(AlarmManager.RTC_WAKEUP, NotificationTime, mPendingIntent);
 
     }
 
+    //Click handling for Recyclerview
+
+    private MemoryPassage ClickedPsg;
+
+    @Override
+    public void onClick(View v, int position) {
+
+        ClickedPsg = lstSavedPsgs.get(position);
+
+        ImageButton btnDeletePsg = findViewById(R.id.btnDeletePsg);
+
+        //Delete button pressed
+        if (v.getId() == R.id.btnDeletePsg) {
+
+            //Passage will be deleted unless dialog intervenes
+            showDeleteDialog(ClickedPsg.getPsgReference());
+
+        }
+
+        //Delete button visible, but another view pressed
+        else if (btnDeletePsg.getVisibility() == View.VISIBLE) {
+            btnDeletePsg.setVisibility(View.GONE);
+        }
+
+        //Delete button not visible, view pressed
+        else {
+            //Open new exercise activity, pass psg along with intent
+            Intent intent = new Intent(this, MemoryExercise.class);
+            intent.putExtra(PSG_KEY, ClickedPsg);
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public boolean onLongClick(View v, int position) {
+
+        ImageButton btnDeletePsg = findViewById(R.id.btnDeletePsg);
+
+        //Make delete button appear
+        if (btnDeletePsg.getVisibility() == View.GONE) {
+            btnDeletePsg.setVisibility(View.VISIBLE);
+        }
+
+        //Hide delete button
+        else {
+            btnDeletePsg.setVisibility(View.GONE);
+        }
+
+        return true;
+    }
+
+    //Dialog box Handling
+
+    private void showDeleteDialog(String PsgRef) {
+        DialogFragment dialog = DeletePsgDialogFragment.newInstance(PsgRef);
+        dialog.show(getFragmentManager(), "DeletePsgDialogFragment");
+    }
+
+    @Override
+    public void onDialogDeleteClick(DialogFragment dialog) {
+        //Delete passage, call onResume to reset recyclerview
+        savedPsgsService.deletePsg(ClickedPsg.getPsgID());
+        onResume();
+    }
+
+    @Override
+    public void onDialogCancelClick(DialogFragment dialog){
+        dialog.dismiss();
+    }
+
+}
 
 
    /* @Override
@@ -192,4 +272,3 @@ public class SavedPassages extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);*/
 
-}

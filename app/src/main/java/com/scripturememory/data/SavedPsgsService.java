@@ -33,9 +33,9 @@ public class SavedPsgsService {
         savedPsgsDao.insertPsg(psg);
     }
 
-    public void updatePsg(MemoryPassage psg) {savedPsgsDao.updatePsg(psg);
+    public void updatePsg(MemoryPassage psg) {savedPsgsDao.updatePsg(psg);}
 
-    }
+    public void deletePsg(String PsgId) {savedPsgsDao.deletePsg(PsgId); }
 
     public long getSavedPsgCount() {
         return savedPsgsDao.getSavedPsgCount();

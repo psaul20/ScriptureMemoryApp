@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.scripturememory.activities.SavedPassages"
+    tools:context="com.scripturememory.activities.SavedPsgs"
     tools:showIn="@layout/activity_saved_psgs">
 
     <android.support.v7.widget.RecyclerView

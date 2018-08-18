@@ -51,6 +51,11 @@ public class SavedPsgsDao {
         logger.info("Rows Updated = " + Integer.toString(intRowsUpdated));
     }
 
+    public void deletePsg(String PsgId){
+        int intRowsDeleted = mDatabase.delete(SavedPsgsTable.TABLE_SAVEDPSGS, SavedPsgsTable.COLUMN_ID + "='" + PsgId + "'",null);
+        logger.info("Rows Deleted = " + Integer.toString(intRowsDeleted));
+    }
+
     public long getSavedPsgCount() {
         return DatabaseUtils.queryNumEntries(mDatabase, SavedPsgsTable.TABLE_SAVEDPSGS);
     }

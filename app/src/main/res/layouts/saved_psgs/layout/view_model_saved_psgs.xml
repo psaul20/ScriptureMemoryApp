@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/clLayout"
     android:layout_width="match_parent"
     android:layout_height="64dp"
@@ -11,25 +12,33 @@
         android:id="@+id/txtPsgRef"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="12dp"
         android:fontFamily="@font/roboto"
         android:text="PsgRef"
         android:textColor="@color/colorTextPrimary"
         android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btnDeletePsg"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/txtExercMsg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="8dp"
         android:fontFamily="@font/roboto"
         android:text="ExercMsg"
         android:textColor="@color/colorTextSecondary"
         android:textSize="12sp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btnDeletePsg"
         app:layout_constraintTop_toBottomOf="@+id/txtPsgRef" />
+
+    <ImageButton
+        android:id="@+id/btnDeletePsg"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:srcCompat="@android:drawable/ic_menu_close_clear_cancel"
+        tools:background="@color/colorCancel" />
 
 </android.support.constraint.ConstraintLayout>
