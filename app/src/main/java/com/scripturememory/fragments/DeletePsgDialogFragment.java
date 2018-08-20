@@ -8,14 +8,16 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 import com.scripturememory.R;
+import com.scripturememory.models.MemoryPassage;
 
 public class DeletePsgDialogFragment extends DialogFragment{
 
-    public static DeletePsgDialogFragment newInstance (String PsgRef) {
+    public static DeletePsgDialogFragment newInstance (String PsgRef, String PsgId) {
         DeletePsgDialogFragment frag = new DeletePsgDialogFragment();
 
         Bundle args = new Bundle();
         args.putString("psg_ref", PsgRef);
+        args.putString("psg_id", PsgId);
         frag.setArguments(args);
 
         return frag;
@@ -25,11 +27,15 @@ public class DeletePsgDialogFragment extends DialogFragment{
         return getArguments().getString("psg_ref");
     }
 
+    public String getPsgId() {
+        return getArguments().getString("psg_id");
+    }
+
     /* The activity that creates an instance of this dialog fragment must
      * implement this interface in order to receive event callbacks.
      * Each method passes the DialogFragment in case the host needs to query it. */
     public interface DeletePassageDialogListener{
-        public void onDialogDeleteClick(DialogFragment dialog);
+        public void onDialogDeleteClick(DialogFragment dialog, String PsgId);
         public void onDialogCancelClick(DialogFragment dialog);
     }
 
@@ -48,7 +54,7 @@ public class DeletePsgDialogFragment extends DialogFragment{
         } catch (ClassCastException e) {
             // The activity doesn't implement the interface, throw exception
             throw new ClassCastException(activity.toString()
-                    + " must implement NoticeDialogListener");
+                    + " must implement DeletePassageDialogListener");
         }
     }
 
@@ -62,7 +68,7 @@ public class DeletePsgDialogFragment extends DialogFragment{
                 .setPositiveButton(R.string.confirmation_delete, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick (DialogInterface dialog, int id) {
-                        mListener.onDialogDeleteClick(DeletePsgDialogFragment.this);
+                        mListener.onDialogDeleteClick(DeletePsgDialogFragment.this, getPsgId());
                     }
                 })
                 .setNegativeButton(R.string.confirmation_cancel, new DialogInterface.OnClickListener() {

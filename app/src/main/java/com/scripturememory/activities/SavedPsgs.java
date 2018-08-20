@@ -9,8 +9,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +20,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -39,8 +42,7 @@ import static com.scripturememory.adapters.SavedPsgAdapter.PSG_KEY;
 
 public class SavedPsgs extends AppCompatActivity
         implements
-        ItemClickListener,
-        DeletePsgDialogFragment.DeletePassageDialogListener {
+        ItemClickListener, DeletePsgDialogFragment.DeletePassageDialogListener {
 
     private RecyclerView rcvSavedPsgs;
     private List<MemoryPassage> lstSavedPsgs = new ArrayList<>();
@@ -179,34 +181,34 @@ public class SavedPsgs extends AppCompatActivity
     }
 
     //Click handling for Recyclerview
-
-    private MemoryPassage ClickedPsg;
+    MemoryPassage clickedPsg;
 
     @Override
     public void onClick(View v, int position) {
 
-        ClickedPsg = lstSavedPsgs.get(position);
+        clickedPsg = lstSavedPsgs.get(position);
 
-        ImageButton btnDeletePsg = findViewById(R.id.btnDeletePsg);
+        //Get specific holder for row that was clicked
+        SavedPsgAdapter.ViewHolder mHolder = (SavedPsgAdapter.ViewHolder) rcvSavedPsgs.findViewHolderForAdapterPosition(position);
 
         //Delete button pressed
         if (v.getId() == R.id.btnDeletePsg) {
 
-            //Passage will be deleted unless dialog intervenes
-            showDeleteDialog(ClickedPsg.getPsgReference());
+            //Show dialog
+            showDeleteDialog(clickedPsg.getPsgReference(), clickedPsg.getPsgID());
 
         }
 
         //Delete button visible, but another view pressed
-        else if (btnDeletePsg.getVisibility() == View.VISIBLE) {
-            btnDeletePsg.setVisibility(View.GONE);
+        else if (mHolder.btnDeletePsg.getVisibility() == View.VISIBLE) {
+            mHolder.btnDeletePsg.setVisibility(View.GONE);
         }
 
         //Delete button not visible, view pressed
         else {
             //Open new exercise activity, pass psg along with intent
             Intent intent = new Intent(this, MemoryExercise.class);
-            intent.putExtra(PSG_KEY, ClickedPsg);
+            intent.putExtra(PSG_KEY, clickedPsg);
             startActivity(intent);
         }
     }
@@ -214,16 +216,17 @@ public class SavedPsgs extends AppCompatActivity
     @Override
     public boolean onLongClick(View v, int position) {
 
-        ImageButton btnDeletePsg = findViewById(R.id.btnDeletePsg);
+        //Get delete specific holder for row that was clicked
+        SavedPsgAdapter.ViewHolder mHolder = (SavedPsgAdapter.ViewHolder) rcvSavedPsgs.findViewHolderForAdapterPosition(position);
 
         //Make delete button appear
-        if (btnDeletePsg.getVisibility() == View.GONE) {
-            btnDeletePsg.setVisibility(View.VISIBLE);
+        if (mHolder.btnDeletePsg.getVisibility() == View.GONE) {
+            mHolder.btnDeletePsg.setVisibility(View.VISIBLE);
         }
 
         //Hide delete button
         else {
-            btnDeletePsg.setVisibility(View.GONE);
+            mHolder.btnDeletePsg.setVisibility(View.GONE);
         }
 
         return true;
@@ -231,15 +234,17 @@ public class SavedPsgs extends AppCompatActivity
 
     //Dialog box Handling
 
-    private void showDeleteDialog(String PsgRef) {
-        DialogFragment dialog = DeletePsgDialogFragment.newInstance(PsgRef);
+    private void showDeleteDialog(String PsgRef, String PsgId) {
+        DialogFragment dialog = DeletePsgDialogFragment.newInstance(PsgRef, PsgId);
         dialog.show(getFragmentManager(), "DeletePsgDialogFragment");
     }
 
     @Override
-    public void onDialogDeleteClick(DialogFragment dialog) {
+    public void onDialogDeleteClick(DialogFragment dialog, String PsgId) {
         //Delete passage, call onResume to reset recyclerview
-        savedPsgsService.deletePsg(ClickedPsg.getPsgID());
+        savedPsgsService.deletePsg(PsgId);
+
+        //Maybe need to use notifyItemRemoved method for adapter instead
         onResume();
     }
 

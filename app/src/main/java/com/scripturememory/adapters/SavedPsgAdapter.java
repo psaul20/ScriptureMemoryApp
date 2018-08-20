@@ -70,9 +70,9 @@ public class SavedPsgAdapter extends RecyclerView.Adapter<SavedPsgAdapter.ViewHo
     // Provide a reference to the views for each data item
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
-        private TextView txtPsgRef;
-        private TextView txtExercMsg;
-        private ImageButton btnDeletePsg;
+        public TextView txtPsgRef;
+        public TextView txtExercMsg;
+        public ImageButton btnDeletePsg;
 
         private ViewHolder(View savedPsgView) {
             super(savedPsgView);
