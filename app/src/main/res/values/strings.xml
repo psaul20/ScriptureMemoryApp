@@ -5,7 +5,7 @@
     <string name="blank_space">____</string>
     <string name="channel_name">Exercise Reminder</string>
     <string name="channel_description">Choose whether or not the app notifies you when Bible Passages are ready for review</string>
-    <string name="no_psg_msg">You haven\'t added any passages yet!\nPress the add button below to add passages.</string>
+    <string name="no_psg_msg">You haven\'t saved any passages!\nPress the add button below to add passages.</string>
     <string name="delete_psg_dialog_msg">Are you sure you want to delete %1$s?</string>
     <string name="delete_psg_dialog_title">Delete Passage</string>
     <string name="confirmation_delete">Delete</string>

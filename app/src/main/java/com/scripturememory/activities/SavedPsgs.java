@@ -2,17 +2,14 @@ package com.scripturememory.activities;
 
 import android.app.AlarmManager;
 import android.app.DialogFragment;
-import android.app.FragmentManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -21,9 +18,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -51,6 +48,7 @@ public class SavedPsgs extends AppCompatActivity
     private SavedPsgsService savedPsgsService;
     private final String CHANNEL_ID = "ExerciseReminder";
     private Notification ntfReadyForReview;
+    private ViewGroup rootLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +82,8 @@ public class SavedPsgs extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+
+        rootLayout = findViewById(R.id.clCoordinator);
 
         savedPsgsService = new SavedPsgsService(this);
         savedPsgsService.openDb();
@@ -128,9 +128,7 @@ public class SavedPsgs extends AppCompatActivity
             }
 
         } else {
-            rcvSavedPsgs.setVisibility(View.GONE);
-            TextView txtNoPsgs = findViewById(R.id.txtNoPsgs);
-            txtNoPsgs.setVisibility(View.VISIBLE);
+            displayDbEmptyMessage();
         }
     }
 
@@ -182,11 +180,19 @@ public class SavedPsgs extends AppCompatActivity
 
     }
 
+    private void displayDbEmptyMessage(){
+        rcvSavedPsgs.setVisibility(View.GONE);
+        TextView txtNoPsgs = findViewById(R.id.txtNoPsgs);
+        txtNoPsgs.setVisibility(View.VISIBLE);
+    }
+
     //Click handling for Recyclerview
     MemoryPassage clickedPsg;
 
     @Override
     public void onClick(View v, int position) {
+
+        TransitionManager.beginDelayedTransition(rootLayout);
 
         clickedPsg = lstSavedPsgs.get(position);
 
@@ -203,6 +209,7 @@ public class SavedPsgs extends AppCompatActivity
 
         //Delete button visible, but another view pressed
         else if (mHolder.btnDeletePsg.getVisibility() == View.VISIBLE) {
+            TransitionManager.beginDelayedTransition(rootLayout);
             mHolder.btnDeletePsg.setVisibility(View.GONE);
         }
 
@@ -218,11 +225,14 @@ public class SavedPsgs extends AppCompatActivity
     @Override
     public boolean onLongClick(View v, int position) {
 
+        TransitionManager.beginDelayedTransition(rootLayout);
+
         //Get delete specific holder for row that was clicked
         SavedPsgAdapter.ViewHolder mHolder = (SavedPsgAdapter.ViewHolder) rcvSavedPsgs.findViewHolderForAdapterPosition(position);
 
         //Make delete button appear
         if (mHolder.btnDeletePsg.getVisibility() == View.GONE) {
+
             mHolder.btnDeletePsg.setVisibility(View.VISIBLE);
         }
 
@@ -243,15 +253,21 @@ public class SavedPsgs extends AppCompatActivity
 
     @Override
     public void onDialogDeleteClick(DialogFragment dialog, String PsgId) {
+
+        TransitionManager.beginDelayedTransition(rootLayout);
+
         //Delete passage, call onResume to reset recyclerview
+
         savedPsgsService.deletePsg(PsgId);
 
         //Maybe need to use notifyItemRemoved method for adapter instead
         onResume();
+
     }
 
     @Override
-    public void onDialogCancelClick(DialogFragment dialog) {
+    public void onDialogCancelClick(DialogFragment dialog){
+        TransitionManager.beginDelayedTransition(rootLayout);
         dialog.dismiss();
     }
 
