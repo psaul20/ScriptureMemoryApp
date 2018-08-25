@@ -65,9 +65,9 @@ public class MemoryExercise extends AppCompatActivity {
     }
 
     //Could possibly move this and other algorithm-related methods into its own class
-    private void endExercise(boolean UpdateDB) {
+    private void endExercise(boolean updateDB) {
 
-        if (UpdateDB) {
+        if (updateDB) {
             SavedPsgsService mSavedPsgsService = new SavedPsgsService(this);
             mSavedPsgsService.openDb();
             mSavedPsgsService.updatePsg(psg);
