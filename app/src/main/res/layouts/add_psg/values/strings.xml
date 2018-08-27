@@ -6,5 +6,6 @@
     <string name="memoryExerciseLabel">Exercise</string>
     <string name="settingsLabel">Settings</string>
     <string name="settingsLanguageLabel">Language</string>
+    <string name="settingsLabelBibleVersion">Bible Version</string>
 
 </resources>

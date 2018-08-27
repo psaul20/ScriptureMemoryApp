@@ -12,6 +12,13 @@
             <intent android:action="goto.SettingsLanguage" />
         </Preference>
 
+        <Preference
+            android:title="Bible Version"
+            android:summary="King James Version"
+            android:key="bible_version" >
+            <intent android:action="goto.SettingsBibleVersion" />
+        </Preference>
+
     </PreferenceCategory>
 
 </PreferenceScreen>

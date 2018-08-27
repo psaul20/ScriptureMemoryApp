@@ -2,10 +2,9 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/settings_language_fragment_container"
+    android:id="@+id/settings_longlist_fragment_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".fragments.SettingsLanguageFragment">
+    android:layout_height="match_parent">
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/clConstraint"
@@ -15,7 +14,7 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/rcvSettingsLanguage"
+            android:id="@+id/rcvSettingsLongList"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginBottom="8dp"

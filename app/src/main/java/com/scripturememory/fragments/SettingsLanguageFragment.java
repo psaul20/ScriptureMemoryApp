@@ -3,7 +3,6 @@ package com.scripturememory.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -19,24 +18,18 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.scripturememory.R;
-import com.scripturememory.activities.AddPsg;
-import com.scripturememory.adapters.AddPsgAdapter;
 import com.scripturememory.adapters.SettingsLanguageAdapter;
 import com.scripturememory.adapters.SettingsLanguageAdapter.OnLanguageClickListener;
 import com.scripturememory.helpers.JsonParser;
-import com.scripturememory.models.AddVerseExpandableGroup;
-import com.scripturememory.models.AddVerseExpandableItem;
 import com.scripturememory.models.Language;
 import com.scripturememory.network.ScriptureClient;
 
 import org.json.JSONArray;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class SettingsLanguageFragment extends Fragment implements OnLanguageClickListener {
 
@@ -67,7 +60,7 @@ public class SettingsLanguageFragment extends Fragment implements OnLanguageClic
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.settings_language_fragment, container, false);
+        final View rootView = inflater.inflate(R.layout.settings_longlist_fragment, container, false);
 
         mScriptureClient = ScriptureClient.getInstance(getActivity());
         populateLanguages(rootView);
@@ -83,13 +76,12 @@ public class SettingsLanguageFragment extends Fragment implements OnLanguageClic
                 logger.info(response.toString());
                 List<Language> availableLanguages;
                 availableLanguages = JsonParser.readLanguages(response);
-                List<String> languages = new ArrayList<>();
                 for (Language language : availableLanguages) {
                     mapLanguages.put(language.getLngCode(), language);
                 }
 
                 //Create RecyclerView to be populated
-                rcvSettingsLanguage = rootView.findViewById(R.id.rcvSettingsLanguage);
+                rcvSettingsLanguage = rootView.findViewById(R.id.rcvSettingsLongList);
 
                 //Used for performance gains if list item layout will not change based on addition of new items
                 rcvSettingsLanguage.setHasFixedSize(true);

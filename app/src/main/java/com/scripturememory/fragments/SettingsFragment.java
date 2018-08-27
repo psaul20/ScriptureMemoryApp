@@ -25,6 +25,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         setPreferencesFromResource(R.xml.settings_preferences, rootKey);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         onSharedPreferenceChanged(sharedPreferences, "language");
+        onSharedPreferenceChanged(sharedPreferences, "bible_version");
     }
 
     @Override

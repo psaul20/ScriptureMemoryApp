@@ -29,9 +29,6 @@ public class SettingsLanguageAdapter extends RecyclerView.Adapter<SettingsLangua
     private Context mContext;
     private static OnLanguageClickListener clickListener;
 
-    //set generic constant to store psg on click with intent.putExtra
-//    public static final String PSG_KEY = "psg_key";
-
     // Provide a suitable constructor (depends on the kind of dataset)
     public SettingsLanguageAdapter(Context context, Map<String, Language> languages) {
         mContext = context;
@@ -56,7 +53,7 @@ public class SettingsLanguageAdapter extends RecyclerView.Adapter<SettingsLangua
         lstLanguages = new ArrayList<>(mapSortedLanguages.values());
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        String languagePreference = preferences.getString("language", "");
+        String languagePreference = preferences.getString("language", "English - ENG");
         int dashIndex = languagePreference.indexOf('-');
         String lngCode = languagePreference.substring(dashIndex+1, languagePreference.length()).trim();
         List<String> indexes = new ArrayList<>(mapSortedLanguages.keySet());
@@ -67,7 +64,7 @@ public class SettingsLanguageAdapter extends RecyclerView.Adapter<SettingsLangua
     @Override
     public SettingsLanguageAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        View languageView = inflater.inflate(R.layout.view_model_language, parent, false);
+        View languageView = inflater.inflate(R.layout.view_model_longlist_selection, parent, false);
         return new SettingsLanguageAdapter.ViewHolder(languageView);
     }
 
@@ -76,7 +73,7 @@ public class SettingsLanguageAdapter extends RecyclerView.Adapter<SettingsLangua
     @Override
     public void onBindViewHolder(final SettingsLanguageAdapter.ViewHolder holder, int position) {
         final Language language = lstLanguages.get(position);
-        holder.txtLanguage.setText(language.getLngName() + " - " + language.getLngCode());
+        holder.txtTitle.setText(language.getLngName() + " - " + language.getLngCode());
         holder.rbSelected.setChecked(position == mSelectedItem);
     }
 
@@ -90,14 +87,14 @@ public class SettingsLanguageAdapter extends RecyclerView.Adapter<SettingsLangua
     // Provide a reference to the views for each data item
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        public TextView txtLanguage;
+        public TextView txtTitle;
         public RadioButton rbSelected;
 
         private ViewHolder(View languageView) {
             super(languageView);
 
             //Link java to views inflated from view model XML
-            txtLanguage = languageView.findViewById(R.id.txtLanguage);
+            txtTitle = languageView.findViewById(R.id.txtTitle);
             rbSelected = languageView.findViewById(R.id.rbSelected);
 
             //Sets clickbox to entire inflated layout
@@ -109,7 +106,7 @@ public class SettingsLanguageAdapter extends RecyclerView.Adapter<SettingsLangua
         public void onClick(View view) {
             mSelectedItem = getAdapterPosition();
             notifyDataSetChanged();
-            String languageText = txtLanguage.getText().toString();
+            String languageText = txtTitle.getText().toString();
             clickListener.onItemClick(languageText ,mSelectedItem);
         }
 
