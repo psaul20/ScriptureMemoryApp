@@ -8,6 +8,7 @@
         <item name="android:textColorPrimary">@color/colorOnPrimary</item>
         <item name="android:textColorSecondary">@color/colorOnSecondary</item>
         <item name="android:fontFamily">@font/roboto</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
 
     <style name="VividTheme.NoActionBar">
@@ -92,6 +93,10 @@
     <style name="VividTheme.Button.Borderless">
         <item name="android:background">@android:color/transparent</item>
         <item name="android:textColor">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="VividTheme.CancelButton">
+        <item name="android:background">@color/colorCancel</item>
     </style>
 
 </resources>

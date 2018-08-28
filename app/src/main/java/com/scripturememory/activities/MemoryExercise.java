@@ -122,15 +122,14 @@ public class MemoryExercise extends AppCompatActivity {
         }
     }
 
-    private void endExercise(boolean UpdateDB) {
-
-        if (UpdateDB) {
+    //Could possibly move this and other algorithm-related methods into its own class
+    private void endExercise(boolean updateDB) {
+        if (updateDB) {
             SavedPsgsService mSavedPsgsService = new SavedPsgsService(this);
             mSavedPsgsService.openDb();
             mSavedPsgsService.updatePsg(psg);
             mSavedPsgsService.closeDb();
         }
-
         finish();
     }
 

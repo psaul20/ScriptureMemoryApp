@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory
+        android:title="Add a Passage" >
+
+        <Preference
+            android:title="Language"
+            android:summary="English"
+            android:key="language" >
+            <intent android:action="goto.SettingsLanguage" />
+        </Preference>
+
+        <Preference
+            android:title="Bible Version"
+            android:summary="King James Version"
+            android:key="bible_version" >
+            <intent android:action="goto.SettingsBibleVersion" />
+        </Preference>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

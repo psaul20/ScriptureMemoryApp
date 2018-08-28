@@ -77,7 +77,6 @@ public class AddPsg extends AppCompatActivity implements OnChildClickListener {
         JsonArrayRequest languageRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
-                System.out.println("HELLO!");
                 logger.info(response.toString());
                 List<Language> availableLanguages;
                 List<AddVerseExpandableItem> languageExpandableItems = new ArrayList<>();

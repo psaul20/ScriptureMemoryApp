@@ -16,21 +16,54 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-            <receiver android:name=".notifications.NotificationReceiver"/>
+        <receiver android:name=".notifications.NotificationReceiver"/>
         <activity
             android:name=".activities.AddPsg"
-            android:parentActivityName=".activities.SavedPsgs">
+            android:parentActivityName=".activities.SavedPsgs"
+            android:label="@string/addPsgLabel">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.SavedPsgs" />
         </activity>
         <activity android:name=".activities.MemoryExercise"
-            android:parentActivityName=".activities.SavedPsgs">
+            android:parentActivityName=".activities.SavedPsgs"
+            android:label="@string/memoryExerciseLabel">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.SavedPsgs" />
         </activity>
-
+        <activity
+            android:name=".activities.Settings"
+            android:parentActivityName=".activities.SavedPsgs"
+            android:label="@string/settingsLabel">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.SavedPsgs" />
+        </activity>
+        <activity
+            android:name=".activities.SettingsLanguage"
+            android:parentActivityName=".activities.Settings"
+            android:label="@string/settingsLanguageLabel">
+            <intent-filter>
+                <action android:name="goto.SettingsLanguage"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.Settings" />
+        </activity>
+        <activity
+            android:name=".activities.SettingsBibleVersion"
+            android:parentActivityName=".activities.Settings"
+            android:label="@string/settingsLabelBibleVersion">
+            <intent-filter>
+                <action android:name="goto.SettingsBibleVersion"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.Settings" />
+        </activity>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

@@ -1,0 +1,11 @@
+<resources>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="addPsgLabel">Add a Passage</string>
+    <string name="memoryExerciseLabel">Exercise</string>
+    <string name="settingsLabel">Settings</string>
+    <string name="settingsLanguageLabel">Language</string>
+    <string name="settingsLabelBibleVersion">Bible Version</string>
+
+</resources>

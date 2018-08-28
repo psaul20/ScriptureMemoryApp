@@ -2,27 +2,25 @@ package com.scripturememory.activities;
 
 import android.app.AlarmManager;
 import android.app.DialogFragment;
-import android.app.FragmentManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -270,14 +268,10 @@ public class SavedPsgs extends AppCompatActivity
     @Override
     public void onDialogCancelClick(DialogFragment dialog){
         TransitionManager.beginDelayedTransition(rootLayout);
-
         dialog.dismiss();
     }
 
-}
-
-
-   /* @Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_saved_verses, menu);
@@ -286,15 +280,16 @@ public class SavedPsgs extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(SavedPsgs.this, Settings.class));
             return true;
         }
 
-        return super.onOptionsItemSelected(item);*/
+        return super.onOptionsItemSelected(item);
+    }
+
+}
 
