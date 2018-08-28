@@ -99,4 +99,6 @@
         <item name="android:background">@color/colorCancel</item>
     </style>
 
+    <style name="alsk"  parent="Theme.Mat"
+
 </resources>
