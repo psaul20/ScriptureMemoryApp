@@ -1,23 +1,97 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="VividTheme" parent="Theme.AppCompat">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColorPrimary">@color/colorTextPrimary</item>
-        <item name="android:textColorPrimaryInverse">@color/colorTextIcons</item>
-        <item name="android:textColorSecondary">@color/colorTextSecondary</item>
-        <item name="android:textColorSecondaryInverse">@color/colorTextIcons</item>
+        <item name="android:textColorPrimary">@color/colorOnPrimary</item>
+        <item name="android:textColorSecondary">@color/colorOnSecondary</item>
+        <item name="android:fontFamily">@font/roboto</item>
     </style>
 
-    <style name="AppTheme.NoActionBar">
+    <style name="VividTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="VividTheme.AppBarOverlay">
+        <item name="android:textColor">@color/colorOnPrimary</item>
+        <item name="android:elevation">@dimen/navigation_elevation</item>
+    </style>
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="VividTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="VividTheme.FloatingActionButton">
+        <item name="android:background">@color/colorSecondary</item>
+        <item name="android:elevation">@dimen/navigation_elevation</item>
+    </style>
+
+    <style name="VividTheme.CardView">
+        <item name="cardElevation">@dimen/content_elevation_basic</item>
+        <item name="cardBackgroundColor">@color/colorSurface</item>
+        <item name="cardCornerRadius">@dimen/card_view_radius</item>
+    </style>
+
+    <style name="VividTheme.CardView.Layout">
+        <item name="android:padding">@dimen/card_view_padding</item>
+    </style>
+
+    <style name="VividTheme.BackgroundLayout">
+        <item name="android:background">@color/colorBackground</item>
+        <item name="android:paddingStart">@dimen/background_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/background_padding_horizontal</item>
+        <item name="android:paddingBottom">@dimen/background_padding_vertical</item>
+        <item name="android:paddingTop">@dimen/background_padding_vertical</item>
+        <item name="android:elevation">@dimen/background_elevation</item>
+    </style>
+
+    <style name="VividTheme.ScrollingRecyclerView">
+        <item name="android:elevation">@dimen/recyclerview_elevation</item>
+        <item name="android:layout_margin">@dimen/recyclerview_margin</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="VividTheme.CardView.RecyclerItemCard">
+        <item name="android:layout_marginBottom">@dimen/recycler_item_margin_bottom</item>
+    </style>
+
+    <style name="VividTheme.TextView">
+        <item name="android:textColor">@color/colorSecondaryLight</item>
+    </style>
+
+    <style name="VividTheme.TextView.Large">
+        <item name="android:textSize">@dimen/content_textview_textsize_large</item>
+        <item name="android:textColor">@color/colorSecondaryDark</item>
+        <item name="android:layout_marginBottom">@dimen/content_textview_large_margin_bottom</item>
+        <item name="android:layout_marginVertical">@dimen/content_textview_large_margin_bottom</item>
+    </style>
+
+    <style name="VividTheme.TextView.Medium">
+        <item name="android:textSize">@dimen/content_textView_textsize_medium</item>
+        <item name="android:textColor">@color/colorSecondaryDark</item>
+        <item name="android:layout_marginBottom">@dimen/content_textview_medium_margin_bottom</item>
+        <item name="android:layout_marginVertical">@dimen/content_textview_medium_margin_bottom</item>
+    </style>
+
+    <style name="VividTheme.TextView.Small">
+        <item name="android:textSize">@dimen/content_textview_textsize_small</item>
+        <item name="android:textColor">@color/colorSecondaryLight</item>
+    </style>
+
+    <style name="VividTheme.Button">
+        <item name="android:background">@color/colorPrimaryDark</item>
+        <item name="android:textColor">@color/colorOnPrimary</item>
+        <item name="android:minWidth">@dimen/button_minwidth</item>
+        <item name="android:textSize">@dimen/button_textsize</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:padding">@dimen/button_padding</item>
+    </style>
+
+    <style name="VividTheme.Button.Borderless">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+    </style>
 
 </resources>
