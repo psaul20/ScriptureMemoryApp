@@ -40,8 +40,7 @@ import com.scripturememory.adapters.SavedPsgAdapter;
 import static com.scripturememory.adapters.SavedPsgAdapter.PSG_KEY;
 
 public class SavedPsgs extends AppCompatActivity
-        implements
-        ItemClickListener, DeletePsgDialogFragment.DeletePassageDialogListener {
+        implements ItemClickListener, DeletePsgDialogFragment.DeletePassageDialogListener {
 
     private RecyclerView rcvSavedPsgs;
     private List<MemoryPassage> lstSavedPsgs = new ArrayList<>();

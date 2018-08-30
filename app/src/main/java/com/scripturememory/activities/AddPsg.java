@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.TransitionManager;
+import android.view.ViewGroup;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,11 +50,14 @@ public class AddPsg extends AppCompatActivity implements OnChildClickListener {
     private RecyclerView recyclerView;
     private AddPsgAdapter addPsgAdapter;
     private List<AddVerseExpandableGroup> groupList = new ArrayList<>();
+    private ViewGroup rootLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_psg);
+
+        rootLayout = findViewById(R.id.root_layout);
 
         mSavedPsgsService = new SavedPsgsService(this);
         mSavedPsgsService.openDb();
@@ -275,6 +280,9 @@ public class AddPsg extends AppCompatActivity implements OnChildClickListener {
 
     @Override
     public void onItemClick(AddVerseExpandableGroup group) {
+
+        TransitionManager.beginDelayedTransition(rootLayout);
+
         if ((group).getTitle().equals("Language")) {
             String selectedLng = group.getSelection();
             selectedLngCode = selectedLng.substring(selectedLng.indexOf('-')+1).trim();

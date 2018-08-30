@@ -155,7 +155,28 @@ public class MemoryPassage implements Parcelable {
         } else {
             strPsgRef = strBook + " " + intChapter + ":" + intStartVerse + "-" + intEndVerse;
         }
-        return strPsgRef;
+
+        //append translation
+        //handles cases where translation includes parentheses or not
+        StringBuilder sbRef = new StringBuilder(getTranslation());
+        int intParenthesisIndex = -1;
+        intParenthesisIndex = sbRef.indexOf("(");
+
+        //parentheses case
+        if(intParenthesisIndex != -1) {
+            sbRef.delete(0, intParenthesisIndex - 1);
+        }
+
+        //no parentheses, add parentheses
+        else {
+            sbRef.replace(0, sbRef.length(), sbRef.substring(sbRef.length() - 3));
+            sbRef.insert(0, "(");
+            sbRef.append(")");
+        }
+
+        strPsgRef += " " + sbRef.toString();
+
+        return strPsgRef.trim();
     }
 
     //could be useful for creating uniform file names when passages are written to JSON files
