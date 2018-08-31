@@ -40,8 +40,7 @@ import com.scripturememory.adapters.SavedPsgAdapter;
 import static com.scripturememory.adapters.SavedPsgAdapter.PSG_KEY;
 
 public class SavedPsgs extends AppCompatActivity
-        implements
-        ItemClickListener, DeletePsgDialogFragment.DeletePassageDialogListener {
+        implements ItemClickListener, DeletePsgDialogFragment.DeletePassageDialogListener {
 
     private RecyclerView rcvSavedPsgs;
     private List<MemoryPassage> lstSavedPsgs = new ArrayList<>();
@@ -83,6 +82,8 @@ public class SavedPsgs extends AppCompatActivity
     protected void onResume() {
         super.onResume();
 
+        boolean blnNotificationScheduled = false;
+
         rootLayout = findViewById(R.id.clCoordinator);
 
         savedPsgsService = new SavedPsgsService(this);
@@ -107,10 +108,6 @@ public class SavedPsgs extends AppCompatActivity
 
             long lngCurrentTimeMillis = System.currentTimeMillis();
 
-            for (MemoryPassage psg : lstSavedPsgs) {
-                ExerciseScheduling.buildExercMsg(psg, lngCurrentTimeMillis);
-            }
-
             //Sort items coming due sooner first
             Collections.sort(lstSavedPsgs, new Comparator<MemoryPassage>() {
                 public int compare(MemoryPassage one, MemoryPassage other) {
@@ -118,14 +115,21 @@ public class SavedPsgs extends AppCompatActivity
                 }
             });
 
-            //If Next Exercise is scheduled for a later time
-            if (lngCurrentTimeMillis < lstSavedPsgs.get(0).getNextExerc()) {
-                //Create NotificationChannel
-                createNotificationChannel();
-                ntfReadyForReview = buildNotification();
-                scheduleNotification(ntfReadyForReview, lstSavedPsgs.get(0).getNextExerc());
+            for (MemoryPassage psg : lstSavedPsgs) {
+                ExerciseScheduling.buildExercMsg(psg, lngCurrentTimeMillis);
 
+                //Notification scheduling
+                if (!blnNotificationScheduled) {
+                    //If Next Exercise is scheduled for a later time
+                    if (lngCurrentTimeMillis < psg.getNextExerc()) {
+                        //Create NotificationChannel
+                        createNotificationChannel();
+                        ntfReadyForReview = buildNotification();
+                        blnNotificationScheduled = scheduleNotification(ntfReadyForReview, psg.getNextExerc());
+                    }
+                }
             }
+
 
         } else {
             displayDbEmptyMessage();
@@ -169,7 +173,8 @@ public class SavedPsgs extends AppCompatActivity
     }
 
 
-    private void scheduleNotification(Notification notification, long NotificationTime) {
+    //returns true to signify a notification was scheduled
+    private boolean scheduleNotification(Notification notification, long NotificationTime) {
         Intent mIntent = new Intent(this, NotificationReceiver.class);
         mIntent.putExtra(NotificationReceiver.NOTIFICATION_ID, 1);
         mIntent.putExtra(NotificationReceiver.NOTIFICATION, notification);
@@ -177,6 +182,8 @@ public class SavedPsgs extends AppCompatActivity
 
         AlarmManager mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         mAlarmManager.set(AlarmManager.RTC_WAKEUP, NotificationTime, mPendingIntent);
+
+        return true;
 
     }
 

@@ -8,7 +8,6 @@
     <dimen name="card_view_radius">4dp</dimen>
     <dimen name="card_view_padding">16dp</dimen>
 
-
     <dimen name="background_padding_horizontal">16dp</dimen>
     <dimen name="background_padding_vertical">16dp</dimen>
     <dimen name="background_elevation">0dp</dimen>
@@ -32,4 +31,5 @@
     <dimen name="button_minwidth">64dp</dimen>
     <dimen name="button_textsize">14sp</dimen>
     <dimen name="button_padding">8dp</dimen>
+
 </resources>
