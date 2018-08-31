@@ -112,4 +112,8 @@
         <item name="android:background">@color/colorCancel</item>
     </style>
 
+    <style name="VividTheme.RadioButton">
+        <item name="android:buttonTint">@color/colorSecondary</item>
+    </style>
+
 </resources>

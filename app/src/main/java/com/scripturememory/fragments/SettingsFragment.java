@@ -33,6 +33,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         super.onResume();
         //register the preference Change listener
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+        onSharedPreferenceChanged(sharedPreferences, "language");
+        onSharedPreferenceChanged(sharedPreferences, "bible_version");
     }
 
     @Override
@@ -45,16 +47,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Preference preference = findPreference(key);
-        if (preference instanceof ListPreference) {
-            ListPreference listPreference = (ListPreference) preference;
-            int prefIndex = listPreference.findIndexOfValue(sharedPreferences.getString(key, ""));
-            if (prefIndex >= 0) {
-                preference.setSummary(listPreference.getEntries()[prefIndex]);
-            }
-        } else {
-            preference.setSummary(sharedPreferences.getString(key, ""));
-
-        }
+        preference.setSummary(sharedPreferences.getString(key, ""));
     }
 
 }

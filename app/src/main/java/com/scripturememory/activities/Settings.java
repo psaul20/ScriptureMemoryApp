@@ -23,12 +23,9 @@ public class Settings extends AppCompatActivity {
                 return;
             }
 
-            // Create a new Fragment to be placed in the activity layout
-            SettingsFragment settingsFragment = new SettingsFragment();
-
             // Add the fragment to the 'settings_language_fragment_container' FrameLayout
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.settings_fragment_container, settingsFragment)
+                    .add(R.id.settings_fragment_container, new SettingsFragment())
                     .commit();
 
             PreferenceManager.setDefaultValues(this, R.xml.settings_preferences, false);
