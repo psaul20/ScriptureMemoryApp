@@ -48,9 +48,6 @@
                 <action android:name="goto.SettingsLanguage"/>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.Settings" />
         </activity>
         <activity
             android:name=".activities.SettingsBibleVersion"
@@ -60,9 +57,6 @@
                 <action android:name="goto.SettingsBibleVersion"/>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.Settings" />
         </activity>
         <meta-data
             android:name="preloaded_fonts"

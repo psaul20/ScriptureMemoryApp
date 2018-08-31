@@ -39,6 +39,12 @@ public class SettingsBibleVersion extends AppCompatActivity implements OnBibleVe
 
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
+    }
+
     // Listener for fragments messages sent to its activity
     @Override
     public void onBibleVersionSelected(String bibleVersion, int position) {

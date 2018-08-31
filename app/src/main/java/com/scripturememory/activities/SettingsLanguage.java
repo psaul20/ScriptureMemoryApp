@@ -39,6 +39,12 @@ public class SettingsLanguage extends AppCompatActivity implements OnLanguageSel
 
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
+    }
+
     // Listener for fragments messages sent to its activity
     @Override
     public void onLanguageSelected(String language, int position) {
